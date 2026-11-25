@@ -615,7 +615,9 @@ const ICO = {
 };
 
 // Fotos de EXEMPLO (Unsplash, banco de fotos gratuito) — trocar pelas fotos reais depois
-const foto = id => /^(blob|data):/.test(id||"") ? id : `fotos/${id}.jpg`; // exemplos ficam na pasta "fotos"; as enviadas pelo usuário já vêm como endereço próprio
+const ARQ = {}; // arquivos enviados (fotos e vídeos) guardados no aparelho: id -> endereço para exibir
+const arq = u => (u||'').startsWith('arq:') ? (ARQ[u.slice(4)] || '') : u;
+const foto = id => (id||'').startsWith('arq:') ? arq(id) : /^(blob|data):/.test(id||"") ? id : `fotos/${id}.jpg`; // exemplos ficam na pasta "fotos"; as enviadas pelo usuário já vêm como endereço próprio
 const FOTOS_SALA = ['1505691938895-1758d7feb511','1560185007-cde436f6a4d0','1560448204-e02f11c3d0e2','1600210492486-724fe5c67fb0','1600607687939-ce8a6c25118c','1502672260266-1c1ef2d93688','1522708323590-d24dbb6b0267','1586023492125-27b2c045efd7'];
 const FOTO_COZINHA = '1484154218962-a197022b5858', FOTO_QUARTO = '1616594039964-ae9021a400a0', FOTO_VARANDA = '1600573472550-8090b5e0745e';
 
@@ -1525,7 +1527,7 @@ function janelaImovel(){
           <span class="status ${statusImovel(i.status)}">${i.status}</span>
         </div>
         ${i.descricao ? `<p style="margin:12px 0 0;white-space:pre-line">${i.descricao}</p>` : ''}
-        ${i.videos?.length ? `<h3 class="tit-det">Vídeos</h3><div class="videos-imo">${i.videos.map(v=>`<video src="${v}" controls preload="metadata" playsinline></video>`).join('')}</div>` : ''}
+        ${i.videos?.length ? `<h3 class="tit-det">Vídeos</h3><div class="videos-imo">${i.videos.map(v=>`<video src="${arq(v)}" controls preload="metadata" playsinline></video>`).join('')}</div>` : ''}
         <div class="info-unid">${info.map(([r,v])=>`<div><span>${r}</span><b>${v}</b></div>`).join('')}</div>
         ${i.ambientes?.length ? `<h3 class="tit-det">${i.tipo==='Terreno' ? 'Características' : 'O que o imóvel tem'}</h3>
           <ul class="lista-det">${i.ambientes.map(a=>`<li>${a}</li>`).join('')}</ul>` : ''}
@@ -1668,11 +1670,11 @@ function formNovoImovel(D){
       <label class="btn sec upload">${ICO.foto} Inserir fotos<input type="file" accept="image/*" multiple data-upload="fotos"></label>
       <label class="btn sec upload">${ICO.video} Inserir vídeos<input type="file" accept="video/*" multiple data-upload="videos"></label>
     </div>
-    ${D.fotos.length ? `<div class="thumbs">${D.fotos.map((u,k)=>`<div class="thumb ${k===0?'capa':''}"><img src="${u}" alt="Foto ${k+1}">
+    ${D.fotos.length ? `<div class="thumbs">${D.fotos.map((u,k)=>`<div class="thumb ${k===0?'capa':''}"><img src="${arq(u)}" alt="Foto ${k+1}">
         ${k===0 ? '<span class="selo">Principal</span>' : `<button type="button" class="tornar-capa" data-ni-capa="${k}">Tornar principal</button>`}
         <button type="button" class="tira" data-ni-tira="fotos|${k}" aria-label="Remover foto ${k+1}">${ICO.x}</button></div>`).join('')}</div>`
       : '<p class="dica-ni">Nenhuma foto ainda. A primeira foto vira a capa do imóvel.</p>'}
-    ${D.videos.length ? `<div class="thumbs">${D.videos.map((u,k)=>`<div class="thumb"><video src="${u}" muted preload="metadata"></video><span class="selo">${ICO.video} Vídeo ${k+1}</span>
+    ${D.videos.length ? `<div class="thumbs">${D.videos.map((u,k)=>`<div class="thumb"><video src="${arq(u)}" muted preload="metadata"></video><span class="selo">${ICO.video} Vídeo ${k+1}</span>
         <button type="button" class="tira" data-ni-tira="videos|${k}" aria-label="Remover vídeo ${k+1}">${ICO.x}</button></div>`).join('')}</div>` : ''}
 
     <div class="secao-ni">Informações principais</div>
@@ -2041,7 +2043,7 @@ function prepararTabelas(){
 }
 
 function render(){
-  renderAbas(); renderMenu(); renderNavMobile();
+  renderAbas(); renderMenu(); renderNavMobile(); salvarDados();
   // mantém a rolagem da janela aberta quando ela é redesenhada (ex.: tocar numa opção do formulário)
   const chave = estado.filtrosAbertos ? 'filtros' : estado.janela ? 'j-'+estado.janela.tipo+(estado.janela.cat||'')+(estado.janela.msg??'') : estado.imovelAberto!=null ? 'i-'+estado.imovelAberto : '';
   const rolagem = document.querySelector('.janela')?.scrollTop || 0;
@@ -2107,7 +2109,7 @@ document.addEventListener('keydown', e=>{ // Enter no "adicionar outro" adiciona
 document.addEventListener('change', e=>{
   const tipo = e.target.dataset.upload, D = estado.janela?.d; if (!tipo || !D) return;
   const arquivos = [...e.target.files].filter(f => f.type.startsWith(tipo==='fotos' ? 'image/' : 'video/'));
-  arquivos.forEach(f => D[tipo].push(URL.createObjectURL(f)));
+  arquivos.forEach(f => { const id = Date.now().toString(36)+Math.random().toString(36).slice(2,8); ARQ[id] = URL.createObjectURL(f); D[tipo].push('arq:'+id); guardarArquivo(id, f); });
   if (arquivos.length) avisar(`${plural(arquivos.length, tipo==='fotos'?'foto adicionada':'vídeo adicionado', tipo==='fotos'?'fotos adicionadas':'vídeos adicionados')}.`);
   render();
 });
@@ -2281,6 +2283,64 @@ document.addEventListener('change', e=>{
 });
 
 $('#hoje').textContent = agora.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+/* ===================== DADOS GUARDADOS NO APARELHO ===================== */
+// Os cadastros ficam no próprio aparelho (localStorage); fotos e vídeos enviados ficam no banco do navegador (IndexedDB).
+const CHAVE_DADOS = 'zani-dados-v1';
+const DADOS_ZANI = ['negocios','corretores','interesse','vendas','tarefas','clientes','imoveis','lancamentos'];
+const DADOS_SITIO = ['parte','lancamentos','acertos'];
+function paraTexto(){
+  const o = { versao:1, salvo:Date.now(), sitio:{} };
+  DADOS_ZANI.forEach(k => o[k] = estado[k]);
+  DADOS_SITIO.forEach(k => o.sitio[k] = estado.sitio[k]);
+  return JSON.stringify(o, function(k,v){ const bruto = this[k]; return bruto instanceof Date ? { __data: bruto.getTime() } : v; });
+}
+let ultimoSalvo = '';
+function salvarDados(){
+  try { const t = paraTexto(); if (t !== ultimoSalvo){ localStorage.setItem(CHAVE_DADOS, t); ultimoSalvo = t; } }
+  catch(e){ if (!salvarDados.avisou){ salvarDados.avisou = true; console.warn('Não foi possível guardar os dados', e); } }
+}
+function carregarDados(){
+  try {
+    const t = localStorage.getItem(CHAVE_DADOS); if (!t) return false;
+    const o = JSON.parse(t, (k,v) => v && typeof v==='object' && v.__data!==undefined && Object.keys(v).length===1 ? new Date(v.__data) : v);
+    DADOS_ZANI.forEach(k => { if (Array.isArray(o[k])) estado[k] = o[k]; });
+    DADOS_SITIO.forEach(k => { if (o.sitio && o.sitio[k]!==undefined) estado.sitio[k] = o.sitio[k]; });
+    ultimoSalvo = t; return true;
+  } catch(e){ console.warn('Dados guardados ilegíveis', e); return false; }
+}
+// banco de arquivos
+function abrirBanco(){
+  return new Promise((ok, erro) => { if (!window.indexedDB) return erro(new Error('sem IndexedDB'));
+    const r = indexedDB.open('zani-arquivos', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('arquivos');
+    r.onsuccess = () => ok(r.result); r.onerror = () => erro(r.error); });
+}
+let bancoArq = null;
+const banco = () => bancoArq || (bancoArq = abrirBanco());
+async function guardarArquivo(id, f){
+  try { const db = await banco(); db.transaction('arquivos','readwrite').objectStore('arquivos').put(f, id); }
+  catch(e){ avisar('Não foi possível guardar o arquivo no aparelho. Ele some ao recarregar a página.'); }
+}
+async function carregarArquivos(){
+  const usados = new Set((paraTexto().match(/arq:[a-z0-9]+/g) || []).map(u => u.slice(4)));
+  const db = await banco();
+  await new Promise(ok => {
+    const loja = db.transaction('arquivos','readwrite').objectStore('arquivos'), r = loja.openCursor();
+    r.onsuccess = () => { const c = r.result; if (!c) return ok();
+      if (usados.has(c.key)) ARQ[c.key] = URL.createObjectURL(c.value); else c.delete(); // apaga arquivos que não estão em nenhum cadastro
+      c.continue(); };
+    r.onerror = () => ok();
+  });
+}
+async function iniciar(){
+  carregarDados();
+  try { await carregarArquivos(); } catch(e){ console.warn('Arquivos não carregados', e); }
+  try { navigator.storage?.persist?.(); } catch(e){}
+  render();
+}
+// garante que nada se perde ao sair (ex.: texto digitado direto na janela da unidade)
+document.addEventListener('visibilitychange', () => { if (document.visibilityState==='hidden') salvarDados(); });
+addEventListener('pagehide', salvarDados);
 setInterval(()=>{ if (!estado.janela && !estado.unidade && estado.imovelAberto==null && !estado.filtrosAbertos) render(); }, 60000); // atualiza os avisos das tarefas a cada minuto (sem apagar formulário aberto)
-render();
+iniciar();
 </script>
