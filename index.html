@@ -1,0 +1,2286 @@
+<!doctype html>
+<html lang="pt-BR">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#16181d">
+<title>App Lucas Zani</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icones/icone-192.png">
+<link rel="apple-touch-icon" href="icones/icone-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Lucas Zani">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f5f7; --panel:#ffffff; --ink:#1b1d22; --muted:#6b7280; --line:#e5e7eb;
+  --side:#16181d; --side-ink:#c9ccd3; --side-hover:#23262d;
+  --laranja:#ec9a3c; --amarelo:#f5d10f; --rosa:#ec7fa9; --azul:#5fa8f0;
+  --verde:#22a06b; --vermelho:#e5484d;
+  --radius:12px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;color-scheme:light}
+body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+button{font:inherit;cursor:pointer}
+.app{display:grid;grid-template-columns:240px 1fr;grid-template-rows:auto 1fr;height:100%}
+
+/* ===== Topo / Abas ===== */
+.topo{grid-column:1 / -1;display:flex;align-items:center;gap:24px;background:var(--side);color:#fff;padding:0 20px;height:60px;border-bottom:1px solid #2a2d35}
+.marca{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.3px;min-width:200px}
+.marca .logo{width:34px;height:34px;border-radius:9px;background:var(--laranja);display:grid;place-items:center;color:#1b1d22;font-weight:800}
+.abas{display:flex;gap:6px;height:100%;align-items:flex-end}
+.aba{background:transparent;border:0;color:#a6aab3;padding:0 22px;height:44px;border-radius:10px 10px 0 0;font-weight:600;display:flex;align-items:center;gap:8px}
+.aba:hover{color:#fff;background:#23262d}
+.aba.ativa{background:var(--bg);color:var(--ink)}
+.aba .bolinha{width:8px;height:8px;border-radius:50%;background:var(--laranja)}
+.topo .direita{margin-left:auto;display:flex;align-items:center;gap:12px;color:#a6aab3}
+.avatar{width:34px;height:34px;border-radius:50%;background:#2e323b;display:grid;place-items:center;color:#fff;font-weight:600}
+.btn-menu{display:none;background:none;border:0;color:#fff;font-size:22px}
+
+/* ===== Menu lateral ===== */
+.lateral{background:var(--side);color:var(--side-ink);padding:16px 12px;overflow-y:auto}
+.lateral .titulo{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#6b7080;padding:8px 12px}
+.item{width:100%;display:flex;align-items:center;gap:12px;background:none;border:0;color:inherit;padding:11px 12px;border-radius:10px;text-align:left;font-weight:500}
+.item:hover{background:var(--side-hover);color:#fff}
+.item.ativo{background:var(--laranja);color:#1b1d22;font-weight:600}
+.item svg{width:18px;height:18px;flex:none}
+.item .cont{margin-left:auto;font-size:11px;background:#2e323b;color:#fff;border-radius:20px;padding:2px 8px}
+.item.ativo .cont{background:#1b1d22}
+.item .cont.alerta{background:var(--vermelho)}
+
+/* ===== Conteúdo ===== */
+.conteudo{overflow-y:auto;padding:28px 32px}
+.cab{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+.cab h1{margin:0;font-size:24px}
+.cab p{margin:4px 0 0;color:var(--muted)}
+.trilha{font-size:12px;color:var(--muted);margin-bottom:6px}
+.btn{border:0;border-radius:9px;padding:9px 16px;font-weight:600;background:var(--ink);color:#fff}
+.btn.sec{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn.peq{padding:5px 10px;font-size:12px}
+
+.grade{display:grid;gap:16px}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+.cartao{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+.cartao h3{margin:0 0 12px;font-size:15px}
+.kpi .rot{color:var(--muted);font-size:12px;font-weight:500}
+.kpi .val{font-size:24px;font-weight:700;margin-top:6px}
+.kpi .det{font-size:12px;color:var(--muted);margin-top:4px}
+.faixa{height:4px;border-radius:4px;margin-bottom:14px}
+
+/* fluxo (setas do organograma) */
+.fluxo{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.etapa{padding:8px 14px;border-radius:9px;font-weight:600;font-size:13px;background:var(--amarelo)}
+.etapa.lar{background:var(--laranja)}
+.etapa.out{background:#fff;border:1px dashed #b9bdc6;color:var(--muted)}
+.seta{color:#9ca3af;font-size:18px}
+
+/* kanban negociação */
+.kanban{display:grid;grid-template-columns:repeat(5,minmax(200px,1fr));gap:14px;overflow-x:auto;padding-bottom:6px}
+.coluna{background:#eceef2;border-radius:var(--radius);padding:12px;min-height:260px}
+.coluna h4{margin:0 0 10px;font-size:13px;display:flex;justify-content:space-between}
+.coluna h4 span{color:var(--muted);font-weight:500}
+.card-neg{background:#fff;border-radius:10px;padding:12px;margin-bottom:10px;border:1px solid var(--line)}
+.card-neg b{display:block;font-size:13px}
+.card-neg small{color:var(--muted);display:block;margin:3px 0 10px}
+.card-neg .acoes{display:flex;gap:6px}
+.card-neg .acoes button{flex:1;border:0;border-radius:7px;padding:6px;font-size:12px;font-weight:600}
+.joia{background:#e6f6ee;color:var(--verde)}
+.naojoia{background:#fdecec;color:var(--vermelho)}
+.tag{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;background:#f1f2f4;color:#444}
+.tag.insta{background:#fbe7f1;color:#b4256b}
+
+/* tabelas */
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:11px 10px;border-bottom:1px solid var(--line)}
+th{font-size:12px;color:var(--muted);font-weight:600}
+tr:last-child td{border-bottom:0}
+.status{font-size:12px;font-weight:600;padding:3px 9px;border-radius:20px}
+/* sítio */
+.sociedade{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:10px 16px;margin-bottom:16px;font-size:13px}
+.sociedade>span:first-child{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-right:6px}
+.sociedade input{width:60px;padding:5px 6px;border:1px solid var(--line);border-radius:7px;font:inherit;text-align:center;margin:0 2px}
+.sociedade .sep{color:var(--muted)}
+.filtros{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.filtros label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--muted)}
+.filtros select{font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:8px;color:var(--ink);background:#fff;min-width:150px}
+.filtros-total{margin-left:auto;color:var(--muted);padding-bottom:8px}
+.mes-bar{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.mes-bar select{font:inherit;font-weight:600;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);min-width:220px;cursor:pointer}
+.mes-bar .passo{width:38px;height:38px;flex:none;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font-size:20px;line-height:1;cursor:pointer}
+.mes-bar .passo:disabled{opacity:.35;cursor:default}
+.no-mes{display:flex;gap:8px;align-items:flex-start;background:#fff7e6;border:1px solid #f3dfb0;color:#7a4b00;border-radius:8px;padding:9px 12px;margin:0 0 12px;font-size:13px}
+.no-mes svg{width:16px;height:16px;flex:none;margin-top:1px}
+tr.mes-sel td{background:#f3f7ff}
+tr.linha-total td{border-top:2px solid var(--line)}
+@media (max-width:760px){.mes-bar select{flex:1;min-width:0;font-size:16px;padding:10px 12px}.mes-bar .passo{width:44px;height:44px}}
+.rolagem{overflow-x:auto}
+th.num,td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.socio{font-size:12px;font-weight:600;padding:2px 9px;border-radius:20px}
+.s-lucas{background:#e6f0fd;color:#2b5fa8} .s-marcos{background:#fdeedd;color:#a35a00}
+.cat-0{background:#eef0f3}.cat-1{background:#e6f6ee;color:#17734d}.cat-2{background:#f0f6e0;color:#55702a}.cat-3{background:#eae8fb;color:#4b3fa3}.cat-4{background:#fdeedd;color:#a35a00}.cat-5{background:#e6f0fd;color:#2b5fa8}
+.cats{display:flex;flex-direction:column;gap:12px}
+.cat-linha{display:grid;grid-template-columns:120px 1fr 110px 44px;align-items:center;gap:12px}
+.cat-nome{font-weight:600}
+.cat-barra{height:12px;background:#eceef2;border-radius:6px;overflow:hidden}
+.cat-barra div{height:100%;background:var(--laranja);border-radius:6px}
+.cat-valor{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.cat-pct{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+.kpi.saldo .det{color:var(--ink)}
+@media (max-width:760px){.cat-linha{grid-template-columns:90px 1fr 90px}.cat-pct{display:none}.filtros-total{margin-left:0}}
+.toast{position:fixed;right:max(20px,env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:80;background:var(--ink);color:#fff;padding:12px 16px;border-radius:10px;font-weight:500;max-width:min(380px,calc(100vw - 40px));box-shadow:0 10px 30px rgba(0,0,0,.25);animation:toast-in .2s ease-out}
+@keyframes toast-in{from{transform:translateY(8px);opacity:.4}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.toast{animation:none}}
+.erro{color:var(--vermelho);font-weight:600;font-size:13px;margin:12px 0 0}
+.alerta-suave{background:#fff6d6;color:#8a6d00;border-radius:8px;padding:9px 12px;font-size:13px;font-weight:500;margin:0 0 14px}
+.campos select{font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:8px;color:var(--ink);background:#fff}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--laranja);outline-offset:2px}
+.s-receber{background:#fff6d6;color:#8a6d00}
+.s-recebido{background:#e6f6ee;color:var(--verde)}
+.s-atrasado{background:#fdecec;color:var(--vermelho)}
+.barra{height:8px;background:#eceef2;border-radius:6px;overflow:hidden}
+.barra div{height:100%;background:var(--verde);border-radius:6px}
+.venda{border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:16px}
+.mudar-status{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.mudar-status>span{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px}
+.seletor{display:inline-flex;background:#f1f2f4;border-radius:10px;padding:4px;gap:4px;flex-wrap:wrap}
+.seletor button{border:0;background:transparent;border-radius:7px;padding:8px 16px;font-weight:600;color:var(--muted)}
+.seletor button:hover{color:var(--ink)}
+.seletor .op-disp.ativo{background:var(--verde);color:#fff}
+.seletor .op-res.ativo{background:var(--amarelo);color:#1b1d22}
+.seletor .op-vend.ativo{background:var(--vermelho);color:#fff}
+.cliente-unid{display:flex;flex-direction:column;gap:5px;margin-top:12px;font-size:12px;font-weight:600;color:var(--muted);max-width:320px}
+.cliente-unid input{font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:8px;color:var(--ink)}
+.ico{width:14px;height:14px;vertical-align:-2px;flex:none}
+.btn-menu .ico{width:22px;height:22px}
+.fechar .ico{width:16px;height:16px;vertical-align:middle}
+.aviso .ico{width:13px;height:13px}
+.icone-vazio .ico{width:44px;height:44px;color:#9ca3af}
+.divisao .taxa input{width:56px;margin:0 2px}
+.divisao{display:flex;flex-wrap:wrap;gap:8px 24px;font-size:13px;margin:2px 0 10px}
+.divisao small{color:var(--muted)}
+/* negociação: corretor, captação e reunião */
+.corretor-linha{display:flex;align-items:center;gap:6px;width:100%;margin-top:10px;background:#f1f4fb;border:0;border-radius:7px;padding:6px 8px;font-size:12px;font-weight:600;color:#2b4a8a;text-align:left}
+.corretor-linha span{margin-left:auto;font-weight:500;color:var(--muted);font-size:11px}
+.corretor-linha.espera{background:#fff6d6;color:#8a6d00;font-weight:600}
+.captado{font-size:11px;color:var(--muted);margin-top:4px}
+.reuniao{display:block;width:100%;margin-top:8px;border:1px dashed var(--laranja);background:#fff7ee;color:#a35a00;border-radius:7px;padding:7px 8px;font-size:12px;font-weight:600;text-align:left}
+.reuniao.marcada{border-style:solid;background:#fff1de}
+.reuniao small{display:block;font-weight:500;color:var(--muted);margin-top:2px}
+/* janelas de formulário */
+.janela.form{width:min(520px,100%)}
+.janela.form .janela-corpo{padding:24px}
+.lista-cor{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto}
+.lista-cor label{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:9px;padding:10px 12px;cursor:pointer}
+.lista-cor label:has(input:checked){border-color:var(--laranja);background:#fff7ee}
+.lista-cor small{display:block;color:var(--muted);font-size:12px}
+.lista-cor input{accent-color:var(--laranja)}
+.campos{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.campos label{font-size:12px;font-weight:600;color:var(--muted);display:flex;flex-direction:column;gap:5px}
+.campos .largo{grid-column:1 / -1}
+.campos input{font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:8px;color:var(--ink)}
+.participantes{display:flex;flex-direction:column;gap:6px}
+.participantes span{background:#f7f8fa;border-radius:8px;padding:8px 10px;font-weight:600}
+.participantes span.fixo{background:#fff1de}
+.participantes small{font-weight:400;color:var(--muted);margin-left:4px}
+.botoes{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}
+.venda-cab{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.taxa{font-size:12px;color:var(--muted);font-weight:600}
+.taxa input{width:60px;padding:5px 6px;border:1px solid var(--line);border-radius:7px;font:inherit;text-align:center}
+.resumo{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:12px}
+.resumo div{background:#f7f8fa;border-radius:9px;padding:10px}
+.resumo span{display:block;font-size:11px;color:var(--muted);margin-bottom:4px}
+.resumo b{font-size:14px}
+.linha-paga td{color:var(--muted)}
+.abrir{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;background:#f7f8fa;border:1px solid var(--line);border-radius:9px;padding:11px 14px;text-align:left;color:var(--ink);font-size:13px}
+.abrir:hover{background:#eef0f3}
+.abrir .seta-abrir{transition:transform .2s;font-size:14px}
+.abrir.aberto .seta-abrir{transform:rotate(180deg)}
+.cartao{overflow-x:auto}
+@media (max-width:1100px){.resumo{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:760px){.resumo{grid-template-columns:1fr 1fr}}
+
+/* sub-abas */
+.subabas{display:flex;gap:6px;margin-bottom:16px;border-bottom:1px solid var(--line)}
+.subaba{background:none;border:0;padding:10px 16px;color:var(--muted);font-weight:600;border-bottom:2px solid transparent;margin-bottom:-1px}
+.subaba.ativa{color:var(--ink);border-color:var(--laranja)}
+
+/* tarefas */
+.tarefa{display:flex;align-items:center;gap:14px;padding:14px;border-radius:10px;border:1px solid var(--line);background:#fff;margin-bottom:10px}
+.tarefa input{width:18px;height:18px;accent-color:var(--verde)}
+.tarefa .txt{flex:1}
+.tarefa .txt small{display:block;color:var(--muted)}
+.tarefa.atencao{background:#fffbe6;border-color:var(--amarelo)}
+.tarefa.atrasada{background:#fdecec;border-color:var(--vermelho)}
+.tarefa.feita{opacity:.55}
+.tarefa.feita .txt b{text-decoration:line-through}
+.aviso{font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap}
+.aviso.atencao{background:var(--amarelo);color:#1b1d22}
+.aviso.atrasada{background:var(--vermelho);color:#fff}
+
+/* imóveis / unidades */
+.foto{height:130px;border-radius:9px;margin:-4px -4px 12px;background:linear-gradient(135deg,#cfd6e0,#9aa7b8);display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px}
+.unidades{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.unidade{border-radius:10px;padding:12px;border:1px solid var(--line);background:#fff}
+.foto{position:relative;overflow:hidden}
+.foto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.tipo{position:absolute;left:10px;bottom:10px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px}
+.unidade{text-align:left;font:inherit;color:inherit;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.unidade:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.08)}
+.unidade img{width:100%;height:90px;object-fit:cover;border-radius:7px;margin-bottom:8px;display:block;background:#dfe3e9}
+.zap{display:inline-flex;align-items:center;gap:6px;background:#25d366;color:#fff;text-decoration:none;font-weight:600;font-size:12px;padding:6px 12px;border-radius:20px;white-space:nowrap}
+.zap:hover{background:#1eb257}
+.zap svg{width:15px;height:15px}
+.zap.curto{padding:6px}
+.fundo-janela{position:fixed;inset:0;background:rgba(10,12,16,.6);display:grid;place-items:center;z-index:50;padding:20px}
+.janela{background:#fff;border-radius:16px;width:min(720px,100%);max-height:calc(100vh - 40px);overflow-y:auto;position:relative}
+.janela .fechar{position:absolute;top:12px;right:12px;z-index:2;width:34px;height:34px;border-radius:50%;border:0;background:rgba(255,255,255,.9);font-size:16px}
+.janela-foto{position:relative;height:340px;background:#dfe3e9}
+.janela-foto img{width:100%;height:100%;object-fit:cover;display:block}
+.miniaturas{display:flex;gap:8px;padding:10px 16px 0}
+.miniaturas button{border:2px solid transparent;border-radius:8px;padding:0;overflow:hidden;width:80px;height:56px;background:#dfe3e9}
+.miniaturas button.ativa{border-color:var(--laranja)}
+.miniaturas img{width:100%;height:100%;object-fit:cover;display:block}
+.janela-corpo{padding:16px 20px 22px}
+.info-unid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+.info-unid div{background:#f7f8fa;border-radius:9px;padding:10px}
+.info-unid span{display:block;font-size:11px;color:var(--muted);margin-bottom:4px}
+.card-imovel{display:block;width:100%;text-align:left;font:inherit;color:var(--ink);cursor:pointer;transition:box-shadow .15s,border-color .15s}
+.card-imovel:hover{border-color:#c9ced6;box-shadow:0 6px 18px rgba(0,0,0,.08)}
+.card-imovel:focus-visible{outline:2px solid var(--laranja);outline-offset:2px}
+.mini-info{font-size:12px;color:var(--muted);margin-bottom:10px}
+.card-pe{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ver-det{font-size:12px;font-weight:600;color:var(--laranja)}
+.tit-det{font-size:14px;margin:18px 0 8px}
+.lista-det{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:6px 16px}
+.lista-det li{position:relative;padding-left:16px;font-size:14px}
+.lista-det li::before{content:"";position:absolute;left:2px;top:7px;width:7px;height:7px;border-radius:50%;background:var(--laranja)}
+.chips-det{display:flex;flex-wrap:wrap;gap:6px}
+.chips-det span{font-size:12px;font-weight:600;padding:5px 10px;border-radius:20px;background:#f1f2f4;color:#333}
+@media (max-width:760px){.lista-det{grid-template-columns:1fr}}
+.venda-ok{display:flex;gap:8px;align-items:flex-start;margin:12px 0 0;padding:10px 12px;border-radius:8px;background:#e8f6ee;color:#1d6b40;font-size:13px;font-weight:600}
+.venda-ok svg{width:16px;height:16px;flex:none;margin-top:1px}
+.rot-campo{font-size:12px;font-weight:600;color:var(--muted);margin:14px 0 6px}
+.forma-pag{display:flex;gap:8px;margin-bottom:12px}
+.forma-pag label{flex:1;display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:9px;padding:11px 12px;font-weight:600;font-size:14px;cursor:pointer;color:var(--ink)}
+.forma-pag label:has(input:checked){border-color:var(--laranja);background:#fff7ec}
+.forma-pag input{accent-color:var(--laranja);margin:0}
+#bloco-parc[hidden]{display:none}
+.barra-filtros{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.btn-filtros{display:inline-flex;align-items:center;gap:6px}
+.btn-filtros svg{width:16px;height:16px}
+.btn-filtros .qtd{background:var(--laranja);color:#fff;border-radius:20px;font-size:11px;padding:1px 7px}
+.ordenar{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);font-weight:600}
+.ordenar select{font:inherit;color:var(--ink);padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.total-filtro{margin-left:auto;color:var(--muted);font-size:13px}
+.tags-filtro{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:14px}
+.tag-filtro{display:inline-flex;align-items:center;gap:6px;border:1px solid #f0c98f;background:#fff7ec;color:#7a4b00;border-radius:20px;padding:5px 10px;font-size:12px;font-weight:600}
+.tag-filtro svg{width:12px;height:12px}
+.limpar-tudo{border:0;background:none;color:var(--muted);font-size:12px;font-weight:600;text-decoration:underline;padding:5px}
+.vazio-filtro{text-align:center;margin-bottom:14px}
+.vazio-filtro p{color:var(--muted);margin:6px 0 12px}
+.faixa-cliente{display:flex;align-items:center;gap:10px;background:#eef4ff;border:1px solid #cfdcf5;color:#23457a;border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:13px}
+.faixa-cliente svg{width:18px;height:18px;flex:none}
+.faixa-cliente span{flex:1}
+.janela.sem-anim{animation:none}
+.grupo-f{margin-top:16px}
+.grupo-f .rot-campo{margin-top:0}
+.chips-f{display:flex;flex-wrap:wrap;gap:6px}
+.chip-f{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:20px;padding:7px 13px;font-size:13px;font-weight:600}
+.chip-f.ativo{background:var(--laranja);border-color:var(--laranja);color:#fff}
+.de-ate{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.de-ate label{font-size:12px;font-weight:600;color:var(--muted);display:flex;flex-direction:column;gap:5px}
+.de-ate input,.sel-f{font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:8px;color:var(--ink);background:#fff;width:100%}
+@media (max-width:760px){
+  .ordenar{flex:1}.ordenar select{flex:1;font-size:16px}
+  .total-filtro{width:100%;margin-left:0}
+  .chip-f{padding:9px 14px}
+  .de-ate input,.sel-f{font-size:16px;padding:10px}
+}
+.acoes-cli{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.sels-cli{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.sels-cli label,.sel-unid{display:flex;flex-direction:column;gap:5px;min-width:0}
+.sels-cli span,.sel-unid span{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.sel-unid{max-width:560px}
+.sels-cli select,.sel-unid select{cursor:pointer;text-overflow:ellipsis}
+.s-pendente{background:#f1f2f4;color:#555}
+.lista-cli{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.card-cli{display:flex;flex-direction:column;gap:12px;padding:14px}
+.abre-ficha{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;background:none;border:0;padding:0;font:inherit;color:var(--ink);cursor:pointer}
+.avatar{width:42px;height:42px;flex:none;border-radius:50%;background:#fde8cc;color:#9a5a00;display:grid;place-items:center;font-weight:700;font-size:14px}
+.avatar.grande{width:56px;height:56px;font-size:18px}
+.dados-cli{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0}
+.dados-cli small{color:var(--muted);font-size:12px}
+.dados-cli .status{align-self:flex-start}
+.seta-cli{color:var(--muted);font-size:20px;line-height:1}
+.busca-cli input{width:100%;font:inherit;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);margin-bottom:10px;box-sizing:border-box}
+.aniv{margin-bottom:14px;padding:14px}
+.aniv-tit{display:flex;align-items:center;gap:8px;font-weight:700;margin-bottom:8px}
+.aniv-tit svg{width:17px;height:17px;color:var(--laranja)}
+.aniv-linha{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.ficha-topo{display:flex;align-items:center;gap:14px;padding-right:36px}
+.ficha-topo .status{margin-top:6px;display:inline-block}
+.acoes-ficha{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.linha-ficha{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;background:#f7f8fa;border-radius:9px;margin-bottom:6px}
+.linha-ficha span{display:flex;flex-direction:column;gap:3px;min-width:0}
+.linha-ficha small{color:var(--muted);font-size:12px}
+.notas{display:grid;gap:6px;margin-top:10px}
+.notas div{background:#fffaf0;border:1px solid #f3e3c3;border-radius:9px;padding:9px 12px;font-size:14px}
+.notas small{display:block;color:var(--muted);font-size:11px;margin-bottom:2px}
+.link-cli{border:0;background:none;padding:0;font:inherit;font-weight:600;color:var(--ink);text-decoration:underline;text-decoration-color:#c9ced6;cursor:pointer;text-align:left}
+@media (max-width:760px){.lista-cli{grid-template-columns:1fr}.busca-cli input{font-size:16px}}
+.secao-ni{font-size:15px;font-weight:700;margin:22px 0 4px;padding-top:16px;border-top:1px solid var(--line)}
+.rot-campo small{font-weight:500;color:var(--muted)}
+.dica-ni{color:var(--muted);font-size:13px;margin:8px 0 0}
+.uploads{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.upload{display:inline-flex;align-items:center;gap:8px;cursor:pointer;position:relative}
+.upload svg{width:17px;height:17px}
+.upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-top:10px}
+.thumb{position:relative;aspect-ratio:4/3;border-radius:9px;overflow:hidden;background:#dfe3e9;border:2px solid transparent}
+.thumb.capa{border-color:var(--laranja)}
+.thumb img,.thumb video{width:100%;height:100%;object-fit:cover;display:block}
+.thumb .selo{position:absolute;left:6px;bottom:6px;background:rgba(0,0,0,.65);color:#fff;font-size:11px;font-weight:600;border-radius:6px;padding:2px 6px;display:inline-flex;gap:4px;align-items:center}
+.thumb .selo svg{width:12px;height:12px}
+.thumb .tira{position:absolute;top:5px;right:5px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;display:grid;place-items:center;padding:0}
+.thumb .tira svg{width:13px;height:13px}
+.thumb .tornar-capa{position:absolute;left:6px;bottom:6px;border:0;background:rgba(255,255,255,.92);color:var(--ink);font-size:11px;font-weight:600;border-radius:6px;padding:3px 7px}
+.outro-num{width:84px;font:inherit;font-size:13px;padding:7px 10px;border:1px solid var(--line);border-radius:20px;text-align:center;color:var(--ink)}
+.add-outro{display:flex;gap:8px;margin-top:10px}
+.add-outro input{flex:1;min-width:0;font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;color:var(--ink)}
+.sem-foto{color:#fff;font-weight:600;font-size:13px}
+.tem-video{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;font-weight:600;border-radius:6px;padding:3px 7px;display:inline-flex;gap:4px;align-items:center}
+.tem-video svg{width:13px;height:13px}
+.sem-foto-grande{display:grid;place-items:center;height:160px!important;background:linear-gradient(135deg,#cfd6e0,#9aa7b8);color:#fff;font-weight:600}
+.videos-imo{display:grid;gap:10px}
+.videos-imo video{width:100%;max-height:340px;border-radius:10px;background:#000}
+@media (max-width:760px){.outro-num,.add-outro input{font-size:16px}.outro-num{width:92px;padding:9px 10px}.thumbs{grid-template-columns:repeat(3,1fr)}}
+.trilha-msg{font-size:12px;color:var(--muted);margin-bottom:6px}
+.voltar-msg{border:0;background:none;color:var(--laranja);font-weight:600;font-size:14px;padding:4px 0;margin-bottom:6px}
+.lista-msg{display:grid;gap:8px}
+.item-msg{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;font:inherit;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer}
+.item-msg:hover{border-color:#c9ced6;background:#fafbfc}
+.item-msg>span:first-child{display:flex;flex-direction:column;gap:3px;min-width:0}
+.item-msg small{color:var(--muted);font-size:12px;line-height:1.4}
+.qtd-msg{color:var(--muted);font-weight:600;font-size:13px;white-space:nowrap}
+.texto-msg{width:100%;font:inherit;font-size:15px;line-height:1.5;padding:12px;border:1px solid var(--line);border-radius:10px;color:var(--ink);resize:vertical;box-sizing:border-box}
+.aviso-colchete{color:#a35a00;font-size:12px;font-weight:600;margin:6px 0 0}
+.aviso-colchete[hidden]{display:none}
+.btn-zap{background:#25d366;border-color:#25d366;color:#fff;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn-zap:hover{background:#1eb257}
+.btn-zap svg{width:17px;height:17px}
+@media (max-width:760px){.texto-msg{font-size:16px}.item-msg{padding:14px}}
+.previa{margin-top:14px;display:grid;gap:6px;background:#f7f8fa;border-radius:9px;padding:12px}
+.previa div{display:flex;justify-content:space-between;gap:12px;font-size:13px}
+.previa span{color:var(--muted)}
+.previa b{text-align:right}
+@media (max-width:760px){.janela-foto{height:220px}.info-unid{grid-template-columns:1fr 1fr}}
+.unidade b{display:block}
+.unidade small{color:var(--muted)}
+.disp{border-left:4px solid var(--verde)} .res{border-left:4px solid var(--amarelo)} .vend{border-left:4px solid var(--vermelho);opacity:.7}
+.legenda{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-bottom:12px}
+.legenda i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+
+.vazio{text-align:center;padding:60px 20px;color:var(--muted)}
+.vazio h2{color:var(--ink);margin:10px 0 6px}
+
+@media (max-width:1100px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:1fr 1fr}}
+/* ===== Barra de navegação de baixo (só no celular) ===== */
+.nav-mobile,.etapas-chips,.folha-mais{display:none}
+.vazio-col{color:var(--muted);font-size:12px;margin:4px 2px}
+.lista-mob{display:none}
+.item-mob{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:8px;background:var(--panel);display:flex;flex-direction:column;gap:6px}
+.item-mob.pago{background:#f7f8fa}
+.item-mob .l1{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.item-mob .l1 .valor{white-space:nowrap;font-variant-numeric:tabular-nums}
+.item-mob .l2{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:12px;color:var(--muted)}
+.item-mob .l2 .dir{margin-left:auto}
+.item-mob .larga{width:100%;margin-top:4px;padding:11px}
+
+/* ===================== CELULAR ===================== */
+@media (max-width:760px){
+  body{font-size:15px}
+  .app{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .lateral{display:none}
+
+  /* topo compacto: logo + seletor Zani / Sítio */
+  .topo{height:56px;gap:12px;padding:0 max(14px,env(safe-area-inset-right,0px)) 0 max(14px,env(safe-area-inset-left,0px))}
+  .marca{min-width:0} .marca span{display:none}
+  .marca .logo{width:32px;height:32px}
+  .abas{flex:1;height:auto;align-items:center;background:#23262d;border-radius:10px;padding:3px;gap:3px}
+  .aba{flex:1;justify-content:center;height:36px;border-radius:8px;padding:0 8px;font-size:14px}
+  .aba.ativa{background:var(--laranja);color:#1b1d22}
+  .aba .bolinha{display:none}
+  .topo .direita{display:none}
+
+  /* conteúdo com espaço para a barra de baixo */
+  .conteudo{padding:16px max(16px,env(safe-area-inset-right,0px)) calc(92px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+  .app.sem-nav .conteudo{padding-bottom:calc(28px + env(safe-area-inset-bottom,0px))}
+  .cab{margin-bottom:16px;gap:12px}
+  .cab h1{font-size:22px}
+  .cab p{font-size:13px}
+  .cab>div:last-child:not(:first-child),.cab>.btn{width:100%}
+  .cab>.btn{padding:13px}
+  .cab>div:last-child:not(:first-child) .btn{flex:1;padding:13px}
+  .trilha{display:none}
+
+  /* barra de baixo */
+  .nav-mobile{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:48;background:var(--side);
+    padding:6px max(6px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-left,0px));border-top:1px solid #2a2d35}
+  .app.sem-nav~.nav-mobile{display:none}
+  .nav-mobile button{position:relative;background:none;border:0;color:#9aa0ab;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;border-radius:10px;font-size:11px;font-weight:600;min-height:52px;justify-content:center}
+  .nav-mobile button svg{width:22px;height:22px}
+  .nav-mobile button.ativo{color:var(--laranja)}
+  .nav-mobile .cont{position:absolute;top:3px;left:calc(50% + 6px);font-size:10px;background:var(--vermelho);color:#fff;border-radius:10px;padding:1px 6px}
+
+  /* folha do "Mais" */
+  .folha-mais{display:block;position:fixed;inset:0;z-index:45;background:rgba(10,12,16,.5)}
+  .folha-mais .folha{position:absolute;left:0;right:0;bottom:0;background:var(--panel);border-radius:18px 18px 0 0;padding:10px 16px calc(84px + env(safe-area-inset-bottom,0px))}
+  .folha-mais .alca{width:40px;height:4px;border-radius:4px;background:#d5d8de;margin:0 auto 12px}
+  .folha-mais h3{margin:0 0 8px;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .folha-mais button{display:flex;align-items:center;gap:14px;width:100%;background:none;border:0;border-radius:12px;padding:14px 10px;font-size:16px;font-weight:600;color:var(--ink);text-align:left}
+  .folha-mais button:active{background:#f1f2f4}
+  .folha-mais button svg{width:22px;height:22px;color:var(--muted)}
+
+  /* números e cartões */
+  .grade{gap:10px}
+  .g4{grid-template-columns:1fr 1fr}
+  .g3,.g2{grid-template-columns:1fr}
+  .cartao{padding:14px}
+  .kpi .val{font-size:19px}
+  .kpi .faixa{margin-bottom:10px}
+  .fluxo{display:none}
+  .fluxo::-webkit-scrollbar{display:none}
+  .etapa{white-space:nowrap;font-size:12px;padding:6px 10px}
+
+  /* tabelas viram cartões */
+  table.cartoes thead{display:none}
+  table.cartoes,table.cartoes tbody,table.cartoes tr,table.cartoes td{display:block;width:100%}
+  table.cartoes tr{border:1px solid var(--line);border-radius:12px;padding:6px 12px;margin-bottom:10px;background:var(--panel)}
+  table.cartoes td{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:7px 0;border-bottom:1px solid #f1f2f4;text-align:right}
+  table.cartoes td:last-child{border-bottom:0}
+  table.cartoes td::before{content:attr(data-label);color:var(--muted);font-size:12px;font-weight:600;text-align:left;flex:none;max-width:45%}
+  table.cartoes td[data-label=""]::before{display:none}
+  table.cartoes td[data-label=""]{justify-content:flex-end}
+  table.cartoes td:first-child{font-weight:600}
+  table.cartoes td.num{white-space:normal}
+  table.cartoes td[colspan]{justify-content:center}
+  .rolagem{overflow-x:visible}
+  .so-desktop{display:none !important}
+  .lista-mob{display:block}
+
+  /* negociação: uma etapa por vez */
+  .etapas-chips{display:flex;gap:8px;overflow-x:auto;margin:0 calc(-1 * max(16px,env(safe-area-inset-left,0px))) 12px;padding:2px max(16px,env(safe-area-inset-left,0px));scrollbar-width:none}
+  .etapas-chips::-webkit-scrollbar{display:none}
+  .etapas-chips button{flex:none;border:1px solid var(--line);background:var(--panel);border-radius:20px;padding:9px 14px;font-weight:600;font-size:13px;color:var(--muted);white-space:nowrap}
+  .etapas-chips button b{margin-left:6px;background:#eceef2;color:var(--ink);border-radius:10px;padding:1px 7px;font-size:12px}
+  .etapas-chips button.ativa{background:var(--ink);border-color:var(--ink);color:#fff}
+  .etapas-chips button.ativa b{background:var(--amarelo);color:#1b1d22}
+  .kanban{display:block;overflow:visible}
+  .coluna{display:none;background:none;padding:0;min-height:0}
+  .coluna.mob-ativa{display:block}
+  .coluna h4{display:none}
+  .coluna .vazio-col{display:block}
+  .card-neg{padding:14px;border-radius:12px}
+  .card-neg b{font-size:15px}
+  .card-neg .acoes button{padding:12px;font-size:14px}
+  .corretor-linha,.reuniao{padding:10px;font-size:13px}
+  .zap.curto{padding:9px}
+  .zap.curto svg{width:18px;height:18px}
+  .zap{padding:9px 14px;font-size:13px}
+
+  /* financeiro */
+  .venda{padding:14px}
+  .venda-cab{margin-bottom:10px}
+  .resumo{grid-template-columns:1fr 1fr;gap:8px}
+  .resumo b{font-size:13px}
+  .divisao{flex-direction:column;gap:8px;font-size:13px}
+  .abrir{padding:13px 12px;font-size:13px}
+  .subabas{overflow-x:auto;scrollbar-width:none;margin-left:-14px;margin-right:-14px;padding:0 14px}
+  .subabas::-webkit-scrollbar{display:none}
+  .subabas{gap:2px}
+  .subaba{white-space:nowrap;padding:12px 9px}
+  .btn.peq{padding:9px 12px;font-size:13px}
+
+  /* tarefas */
+  .tarefa{padding:14px 12px;gap:12px;flex-wrap:wrap}
+  .tarefa input{width:24px;height:24px}
+  .tarefa .txt{min-width:0;flex:1 1 60%}
+  .legenda{flex-direction:column;gap:6px}
+
+  /* lançamentos e imóveis */
+  .unidades{grid-template-columns:1fr 1fr;gap:8px}
+  .unidade{padding:10px}
+  .unidade img{height:80px}
+
+  /* sítio */
+  .sociedade{padding:12px 14px}
+  .sociedade>span:first-child{width:100%}
+  .filtros label{flex:1 1 140px}
+  .filtros select{min-width:0;width:100%;padding:10px}
+  .filtros-total{width:100%;padding:0}
+  .cat-linha{grid-template-columns:1fr auto;grid-template-areas:"nome valor" "barra barra";gap:6px 10px}
+  .cat-nome{grid-area:nome}.cat-valor{grid-area:valor}.cat-barra{grid-area:barra}
+
+  /* janelas sobem de baixo */
+  .fundo-janela{place-items:end stretch;padding:0}
+  .janela{width:100%;max-height:92vh;border-radius:18px 18px 0 0;padding-bottom:env(safe-area-inset-bottom,0px);animation:sobe .22s ease-out}
+  .janela.form{width:100%}
+  .janela.form .janela-corpo{padding:20px 16px 24px}
+  .campos{grid-template-columns:1fr}
+  .botoes{position:sticky;bottom:0;background:var(--panel);padding-top:12px;margin-top:16px}
+  .botoes .btn{flex:1;padding:14px}
+  .janela-foto{height:240px}
+  .info-unid{grid-template-columns:1fr 1fr}
+  .seletor{display:flex}
+  .seletor button{flex:1;padding:11px 4px;white-space:nowrap;font-size:13px}
+  .miniaturas{overflow-x:auto}
+  .miniaturas button{flex:none}
+
+  /* campos com 16px para o celular não dar zoom */
+  input,select,textarea{font-size:16px !important}
+  .toast{left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));max-width:none;bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+}
+@keyframes sobe{from{transform:translateY(40px);opacity:.6}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.janela{animation:none}}
+</style>
+<div class="app" id="app">
+  <header class="topo">
+    <div class="marca"><div class="logo">L</div><span>APP LUCAS</span></div>
+    <nav class="abas" id="abas"></nav>
+    <div class="direita"><span id="hoje"></span><div class="avatar">LZ</div></div>
+  </header>
+
+  <aside class="lateral" id="lateral">
+    <div class="titulo">Menu</div>
+    <div id="menu"></div>
+  </aside>
+
+  <main class="conteudo" id="conteudo"></main>
+</div>
+<nav class="nav-mobile" id="navMobile" aria-label="Menu principal"></nav>
+<div id="maisMobile"></div>
+
+<script>
+/* ===================== DADOS DE EXEMPLO ===================== */
+const ABAS = [
+  { id:'zani', nome:'Zani Imóveis' },
+  { id:'sitio', nome:'Sítio' },
+];
+
+const ic = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+const MENU = [
+  { id:'inicio',      nome:'Início',      icone:ic('<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>') },
+  { id:'financeiro',  nome:'Financeiro',  icone:ic('<line x1="12" y1="2" x2="12" y2="22"/><path d="M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>') },
+  { id:'negociacao',  nome:'Negociação',  icone:ic('<path d="M3 7h18M3 12h12M3 17h7"/>') },
+  { id:'clientes',    nome:'Clientes',    icone:ic('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.5a5 5 0 0 1 5.5 5"/>') },
+  { id:'cadastro',    nome:'Cadastro',    icone:ic('<circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M19 8v6M16 11h6"/>') },
+  { id:'imoveis',     nome:'Imóveis',     icone:ic('<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 7h1M14 7h1M9 11h1M14 11h1M10 21v-4h4v4"/>') },
+  { id:'tarefas',     nome:'Tarefas',     icone:ic('<path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/>') },
+  { id:'lancamentos', nome:'Lançamentos', icone:ic('<path d="M3 21h18"/><path d="M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6"/>') },
+];
+
+const ETAPAS = [
+  { id:'interessado', nome:'Interessado' },
+  { id:'potencial',   nome:'Cliente potencial' },
+  { id:'visita',      nome:'Visita' },
+  { id:'proposta',    nome:'Proposta' },
+  { id:'fechamento',  nome:'Fechamento do negócio' },
+];
+
+const agora = new Date();
+const emMin = m => new Date(agora.getTime() + m*60000);
+const fmtHora = d => d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+const TAXA_PADRAO = 0.05;    // comissão padrão: 5% em média
+const TAXA_CAPTACAO = 0.10;  // valor inicial da captação (% da comissão); pode ser mudado em cada venda no Financeiro
+
+// Ícones de linha (no lugar de emojis)
+const icl = p => `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+const ICO = {
+  user:  icl('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'),
+  link:  icl('<path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>'),
+  cal:   icl('<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/>'),
+  x:     icl('<path d="M6 6l12 12M18 6L6 18"/>'),
+  menu:  icl('<path d="M4 6h16M4 12h16M4 18h16"/>'),
+  alerta:icl('<path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>'),
+  relogio:icl('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+  pasta: icl('<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>'),
+  filtro: icl('<path d="M4 6h16M7 12h10M10 18h4"/>'),
+  video: icl('<rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3z"/>'),
+  foto: icl('<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M21 17l-5-5-8 7"/>'),
+};
+
+// Fotos de EXEMPLO (Unsplash, banco de fotos gratuito) — trocar pelas fotos reais depois
+const foto = id => /^(blob|data):/.test(id||"") ? id : `fotos/${id}.jpg`; // exemplos ficam na pasta "fotos"; as enviadas pelo usuário já vêm como endereço próprio
+const FOTOS_SALA = ['1505691938895-1758d7feb511','1560185007-cde436f6a4d0','1560448204-e02f11c3d0e2','1600210492486-724fe5c67fb0','1600607687939-ce8a6c25118c','1502672260266-1c1ef2d93688','1522708323590-d24dbb6b0267','1586023492125-27b2c045efd7'];
+const FOTO_COZINHA = '1484154218962-a197022b5858', FOTO_QUARTO = '1616594039964-ae9021a400a0', FOTO_VARANDA = '1600573472550-8090b5e0745e';
+
+// Botão de WhatsApp (abre a conversa com o cliente)
+const ICONE_ZAP = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5 2.5 1 3 .8 3.6.7.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.3-.6-.4zM12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2z"/></svg>';
+const zap = (nome, tel, curto=false) => {
+  const num = '55' + String(tel||'').replace(/\D/g,'');
+  const msg = encodeURIComponent(`Olá, ${nome.split(' ')[0]}! Aqui é o Lucas, da Zani Imóveis.`);
+  return `<a class="zap ${curto?'curto':''}" href="https://wa.me/${num}?text=${msg}" target="_blank" rel="noopener" title="Chamar ${nome} no WhatsApp">${ICONE_ZAP}${curto?'':'WhatsApp'}</a>`;
+};
+/* mensagens prontas: categoria > mensagem > texto para enviar */
+const MENSAGENS = [
+  { id:'contato', nome:'Primeiro contato', desc:'Boas-vindas e retorno de anúncio', itens:[
+    ['Boas-vindas','Olá, [nome]! Aqui é [corretor], da Zani Imóveis. Recebi seu interesse no [imóvel] e estou à disposição para tirar suas dúvidas.'],
+    ['Retorno de anúncio','Olá, [nome]! Vi que você se interessou pelo anúncio do [imóvel]. Posso te mandar mais fotos e informações?'] ]},
+  { id:'visita', nome:'Visita', desc:'Convite, confirmação e pós-visita', itens:[
+    ['Convite para visita','Olá, [nome]! Que tal conhecer o [imóvel] pessoalmente? Tenho horários na [dia]. Qual fica melhor para você?'],
+    ['Confirmação de visita','Olá, [nome]! Confirmando nossa visita amanhã às [hora], no endereço [endereço]. Qualquer imprevisto, me avise.'],
+    ['Pós-visita','Obrigado pela visita, [nome]! O que achou do [imóvel]? Ficou alguma dúvida?'] ]},
+  { id:'oferta', nome:'Oferta', desc:'Imóvel no perfil, redução de preço e lançamento', itens:[
+    ['Imóvel novo no seu perfil','Olá, [nome]! Entrou um imóvel com o que você procura: [tipo], [quartos], no bairro [bairro], por [valor]. Quer ver?'],
+    ['Redução de preço','Boa notícia, [nome]: o [imóvel] que você viu baixou para [valor].'],
+    ['Lançamento','Olá, [nome]! Estamos lançando o [empreendimento], com condições especiais na planta. Posso te mandar a tabela?'] ]},
+  { id:'negociacao', nome:'Negociação', desc:'Proposta, documentos, financiamento e fechamento', itens:[
+    ['Proposta recebida','Olá, [nome]! Recebemos sua proposta para o [imóvel] e já encaminhamos ao proprietário. Te dou retorno até [data].'],
+    ['Documentos','Olá, [nome]! Para seguir com a negociação, vou precisar destes documentos: RG, CPF, comprovante de renda e comprovante de residência.'],
+    ['Simulação de financiamento','Olá, [nome]! Fiz uma simulação para o [imóvel]: entrada de [entrada] e parcelas de aproximadamente [parcela]. Quer conversar sobre ela?'],
+    ['Reunião de fechamento','Olá, [nome]! Nossa reunião de fechamento ficou para [data da reunião], às [hora da reunião], com o Lucas. Até lá!'] ]},
+  { id:'posvenda', nome:'Pós-venda', desc:'Parabéns, lembrete de parcela e indicação', itens:[
+    ['Parabéns pela compra','Parabéns pela conquista, [nome]! Foi um prazer fazer parte desse momento. Conte sempre com a Zani Imóveis.'],
+    ['Lembrete de parcela','Olá, [nome]! Lembrete: a [parcela nº] vence em [vencimento], no valor de [valor da parcela].'],
+    ['Pedido de indicação','Olá, [nome]! Se conhecer alguém procurando imóvel, indique a Zani Imóveis. Vamos cuidar com o mesmo carinho.'] ]},
+  { id:'relacionamento', nome:'Relacionamento', desc:'Retomar contato, aniversário e captação', itens:[
+    ['Retomar contato','Oi, [nome]! Faz um tempo que não conversamos. Ainda está procurando imóvel? Tenho novidades.'],
+    ['Aniversário','Feliz aniversário, [nome]! A equipe da Zani Imóveis deseja um ótimo dia.'],
+    ['Proprietário (captação)','Olá, [nome]! Tem interesse em vender ou alugar seu imóvel? Fazemos a avaliação sem custo.'] ]},
+];
+// Preenche o que o app já sabe do cliente; o que não souber fica entre colchetes para completar
+function preencherMensagem(texto, nomeCli){
+  const c = clientePorNome(nomeCli) || { nome:nomeCli };
+  const neg = estado.negocios.find(n=>n.cliente===c.nome);
+  const venda = estado.vendas.find(v=>v.cliente===c.nome);
+  const sugerido = c.busca ? (()=>{ const F = FILTRO_VAZIO(); Object.assign(F,{tipos:c.busca.tipos||[],vmin:c.busca.vmin??null,vmax:c.busca.vmax??null,quartos:c.busca.quartos||0}); return imoveisFiltrados(F)[0]; })() : null;
+  const nomeIm = neg?.imovel || venda?.imovel || sugerido?.nome;
+  const im = estado.imoveis.find(i=>i.nome===nomeIm) || sugerido;
+  const prox = venda?.pagamentos.find(p=>!p.pago);
+  const quando = neg?.reuniao?.quando;
+  const mapa = {
+    'nome': c.nome.split(' ')[0],
+    'corretor': nomeCor(neg?.corretor || c.captador || 1),
+    'imóvel': nomeIm,
+    'endereço': im?.endereco,
+    'valor': im ? real(im.valor) : null,
+    'tipo': im ? categoriaImovel(im).toLowerCase() : null,
+    'quartos': im?.quartos ? plural(im.quartos,'quarto','quartos') : null,
+    'bairro': im ? bairroDe(im) : null,
+    'empreendimento': estado.lancamentos[0]?.nome,
+    'entrada': im ? real(Math.round(im.valor*0.2)) : null,
+    'parcela': im ? real2(im.valor*0.8/24)+' em 24x' : null,
+    'parcela nº': prox ? prox.nome.toLowerCase() : null,
+    'vencimento': prox ? fmtData(prox.venc) : null,
+    'valor da parcela': prox ? real2(prox.valor) : null,
+    'data da reunião': quando ? fmtData(quando) : null,
+    'hora da reunião': quando ? fmtHora(quando) : null,
+  };
+  return texto.replace(/\[([^\]]+)\]/g, (t,k) => mapa[k] || t);
+}
+const linkZap = (tel, texto) => `https://wa.me/55${String(tel||'').replace(/\D/g,'')}?text=${encodeURIComponent(texto)}`;
+const real = v =>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0});
+
+const estado = {
+  aba:'zani', menu:'inicio', sub:{}, etapaMob:'interessado', mais:false, abertos:new Set(), // vendas com o menu de parcelas aberto
+  negocios:[
+    { id:1, cliente:'Mariana Souza',   tel:'(11) 98888-1020', imovel:'Apto 2 quartos — Centro',     origem:'Instagram', etapa:'interessado' },
+    { id:2, cliente:'Carlos Lima',     tel:'(11) 95555-7788', imovel:'Casa 3 quartos — Jardim Europa', origem:'Indicação', etapa:'interessado' },
+    { id:3, cliente:'Fernanda Rocha',  tel:'(11) 94444-6655', imovel:'Cobertura — Vila Nova',       origem:'Instagram', etapa:'potencial', corretor:2 },
+    { id:4, cliente:'Roberto Alves',   tel:'(11) 93333-1290', imovel:'Terreno 360 m²',              origem:'Site',      etapa:'visita', corretor:3 },
+    { id:5, cliente:'Juliana Martins', tel:'(11) 92222-4512', imovel:'Apto 3 quartos — Parque',     origem:'Instagram', etapa:'proposta', corretor:4 },
+    { id:6, cliente:'Paulo Henrique',  tel:'(11) 97777-3344', imovel:'Casa térrea — Bela Vista',    origem:'Placa',     etapa:'fechamento', corretor:2 },
+  ],
+  // Corretores. O id 1 é o administrador (Lucas).
+  corretores:[
+    { id:1, nome:'Lucas Zani',      creci:'CRECI 000000', funcao:'Administrador', tel:'(11) 99999-0000' },
+    { id:2, nome:'Ana Ribeiro',     creci:'CRECI 000001', funcao:'Corretora',     tel:'(11) 99111-2201' },
+    { id:3, nome:'Bruno Teixeira',  creci:'CRECI 000002', funcao:'Corretor',      tel:'(11) 99222-3302' },
+    { id:4, nome:'Camila Duarte',   creci:'CRECI 000003', funcao:'Corretora',     tel:'(11) 99333-4403' },
+    { id:5, nome:'Diego Ferraz',    creci:'CRECI 000004', funcao:'Corretor',      tel:'(11) 99444-5504' },
+    { id:6, nome:'Patrícia Nunes',  creci:'CRECI 000005', funcao:'Corretora',     tel:'(11) 99555-6605' },
+    { id:7, nome:'Rafael Moreira',  creci:'CRECI 000006', funcao:'Corretor',      tel:'(11) 99666-7706' },
+  ],
+  janela:null, // janela aberta: {tipo:'encaminhar'|'reuniao', neg:id}
+  interesse:[ // CADASTRO DE INTERESSE (quem saiu do funil)
+    { cliente:'André Costa', saiuEm:'Visita', motivo:'Achou o valor alto', imovel:'Casa 2 quartos — Centro' },
+  ],
+  vendas:[
+    montarVenda({ imovel:'Casa térrea — Bela Vista', cliente:'Paulo Henrique', valor:480000, entrada:96000, parcelas:12, pagas:4, contrato:'Contrato #0142 / NF 3381', inicio:-3, vendedor:2, captador:5 }),
+    montarVenda({ imovel:'Apto 2 quartos — Centro',  cliente:'Lúcia Prado',    valor:320000, entrada:320000, parcelas:0, pagas:1, contrato:'Contrato #0139 / NF 3370', inicio:-2, vendedor:6, captador:6 }),
+    montarVenda({ imovel:'Sala comercial — Av. Brasil', cliente:'Grupo Atlas', valor:210000, entrada:42000, parcelas:6, pagas:0, contrato:'Contrato #0144 / NF —', inicio:0, vendedor:7, captador:3 }),
+  ],
+  tarefas:[
+    { id:1, titulo:'Ligar para Juliana sobre a proposta', quando:emMin(-40), feita:false },
+    { id:2, titulo:'Visita com Roberto no terreno',       quando:emMin(25),  feita:false },
+    { id:3, titulo:'Enviar contrato ao Paulo',            quando:emMin(150), feita:false },
+    { id:4, titulo:'Postar imóvel novo no Instagram',     quando:emMin(-120),feita:true  },
+  ],
+  // captador = corretor que captou o cliente na visita (o cliente fica na carteira dele)
+  clientes:[
+    { nome:'Mariana Souza', email:'mariana.souza@email.com', nascimento:'1990-11-28', origem:'Instagram', cadastro:'2026-10-02',   tel:'(11) 98888-1020', perfil:'Comprador',    captador:null, busca:{ tipos:['Apartamento'], vmax:400000, quartos:2 } },
+    { nome:'Carlos Lima', email:'carlos.lima@email.com', nascimento:'1985-11-24', origem:'Site', cadastro:'2026-10-15',     tel:'(11) 95555-7788', perfil:'Comprador',    captador:null, busca:{ tipos:['Casa'], vmax:700000, quartos:3, vagas:2 } },
+    { nome:'Fernanda Rocha', email:'fernanda.rocha@email.com', nascimento:'1988-03-12', origem:'Indicação', cadastro:'2026-09-20',  tel:'(11) 94444-6655', perfil:'Compradora',   captador:null, busca:{ tipos:['Apartamento','Cobertura'], vmin:500000, quartos:3 } },
+    { nome:'Roberto Alves', email:'', nascimento:'1979-07-05', origem:'Placa', cadastro:'2026-11-05',   tel:'(11) 93333-1290', perfil:'Comprador',    captador:null, busca:{ tipos:['Terreno'], vmax:300000 } },
+    { nome:'Juliana Martins', email:'juliana.m@email.com', nascimento:'1993-11-09', origem:'Indicação', cadastro:'2026-08-30', tel:'(11) 92222-4512', perfil:'Compradora',   captador:4, busca:{ tipos:['Casa','Apartamento'], vmax:550000, quartos:2, bairro:'Jardim Europa' } },
+    { nome:'Paulo Henrique', email:'paulo.h@email.com', nascimento:'1982-01-17', origem:'Portal', cadastro:'2026-07-10',  tel:'(11) 97777-3344', perfil:'Comprador',    captador:5 },
+    { nome:'Lúcia Prado', email:'lucia.prado@email.com', nascimento:'1970-05-22', origem:'Indicação', cadastro:'2026-06-18',     tel:'(11) 96666-2211', perfil:'Proprietária', captador:6 },
+    { nome:'Grupo Atlas', email:'contato@grupoatlas.com', nascimento:'', origem:'Site', cadastro:'2026-08-01',     tel:'(11) 3333-4040',  perfil:'Empresa',      captador:3 },
+    { nome:'Sérgio Mendes', email:'sergio.mendes@email.com', nascimento:'1975-12-03', origem:'Indicação', cadastro:'2026-09-02',   tel:'(11) 98123-5566', perfil:'Investidor',   captador:3, busca:{ tipos:['Comercial','Apartamento'], vmax:350000 } },
+    { nome:'Renata Gomes', email:'renata.gomes@email.com', nascimento:'1991-02-14', origem:'Instagram', cadastro:'2026-11-12', notas:[{data:'2026-11-12', texto:'Quer casa com área gourmet. Tem dois filhos e um cachorro.'}],    tel:'(11) 97456-8899', perfil:'Compradora',   captador:7, busca:{ tipos:['Casa'], vmin:400000, vmax:900000, quartos:3, difs:['gourmet'] } },
+  ],
+  imoveis:[
+    { nome:'Apto 2 quartos — Centro', captador:6, cadastro:'2026-08-20', tipo:'Apartamento', valor:320000, area:68, status:'Disponível', foto:'1493809842364-78817add7ffb',
+      endereco:'Rua XV de Novembro, 820 — Centro', quartos:2, suites:1, banheiros:2, vagas:1, andar:'5º andar', condominio:650,
+      descricao:'Apartamento reformado, com boa iluminação e perto do comércio do Centro.',
+      ambientes:['Sala de estar e jantar','Cozinha americana','2 quartos, sendo 1 suíte','Banheiro social','Área de serviço','Sacada'],
+      diferenciais:['Elevador','Portaria 24 horas','Armários planejados','Aceita financiamento'],
+      galeria:[['sala',2],['cozinha'],['quarto'],['varanda','Sacada']] },
+    { nome:'Casa 3 quartos — Jardim Europa', captador:2, cadastro:'2026-10-05', tipo:'Casa', valor:650000, area:180, status:'Disponível', foto:'1570129477492-45c003edd2be',
+      endereco:'Rua das Hortênsias, 155 — Jardim Europa', quartos:3, suites:1, banheiros:3, vagas:2, terreno:300,
+      descricao:'Casa ampla em rua tranquila, com área gourmet e quintal.',
+      ambientes:['Sala de estar','Sala de jantar','Cozinha planejada','3 quartos, sendo 1 suíte','Lavabo','Área gourmet com churrasqueira','Lavanderia','Quintal'],
+      diferenciais:['Portão eletrônico','Aquecimento solar','Quintal gramado','Aceita financiamento'],
+      galeria:[['sala',4],['cozinha'],['quarto'],['varanda','Área gourmet']] },
+    { nome:'Cobertura — Vila Nova', captador:4, cadastro:'2026-09-12', tipo:'Apartamento', valor:1200000, area:210, status:'Em negociação', foto:'1600596542815-ffad4c1539a9',
+      endereco:'Av. das Américas, 1.200 — Vila Nova', quartos:4, suites:3, banheiros:5, vagas:3, andar:'Cobertura (15º andar)', condominio:1800,
+      descricao:'Cobertura duplex com terraço, piscina privativa e vista para a cidade.',
+      ambientes:['Sala com pé-direito duplo','Sala de jantar','Cozinha gourmet','4 quartos, sendo 3 suítes','Home office','Lavabo','Terraço com piscina','Dependência de serviço'],
+      diferenciais:['Vista panorâmica','Piscina privativa','Academia e salão de festas no prédio','Depósito privativo'],
+      galeria:[['sala',5],['sala',6,'Sala de jantar'],['cozinha'],['quarto','Suíte principal'],['varanda','Terraço']] },
+    { nome:'Terreno 360 m²', captador:5, cadastro:'2026-07-30', tipo:'Terreno', valor:190000, area:360, status:'Disponível', foto:'1500382017468-9049fed747ef',
+      endereco:'Rua Projetada 4, lote 12 — Parque das Águas', frente:12, fundo:30,
+      descricao:'Terreno plano, pronto para construir, em bairro residencial em crescimento.',
+      ambientes:['Terreno plano','12 m de frente por 30 m de fundo','Rua asfaltada','Água, luz e esgoto na rua'],
+      diferenciais:['Documentação em dia','Zona residencial','Aceita proposta'],
+      galeria:[] },
+    { nome:'Casa térrea — Bela Vista', captador:5, cadastro:'2026-06-15', tipo:'Casa', valor:480000, area:140, status:'Vendido', cliente:'Paulo Henrique', foto:'1600585154340-be6161a56a0c',
+      endereco:'Rua Bela Vista, 77 — Bela Vista', quartos:3, suites:1, banheiros:2, vagas:2, terreno:250,
+      descricao:'Casa térrea, toda no mesmo nível, com varanda e garagem coberta.',
+      ambientes:['Sala de estar','Cozinha','3 quartos, sendo 1 suíte','Banheiro social','Área de serviço','Varanda','Garagem coberta'],
+      diferenciais:['Tudo no térreo','Garagem coberta para 2 carros'],
+      galeria:[['sala',7],['cozinha'],['quarto'],['varanda']] },
+    { nome:'Sala comercial — Av. Brasil', captador:3, cadastro:'2026-07-02', tipo:'Comercial', valor:210000, area:45, status:'Vendido', cliente:'Grupo Atlas', foto:'1497366216548-37526070297c',
+      endereco:'Av. Brasil, 2.340, sala 804 — Centro', banheiros:1, vagas:1, andar:'8º andar', condominio:480,
+      descricao:'Sala comercial pronta para uso, em prédio com recepção.',
+      ambientes:['Recepção','Sala de atendimento','Copa','Banheiro'],
+      diferenciais:['Ar-condicionado','Prédio com recepção e elevador','Perto do ponto de ônibus'],
+      galeria:[] },
+    { nome:'Apto 3 quartos — Jardim Europa', captador:7, cadastro:'2026-11-12', tipo:'Apartamento', valor:540000, area:95, status:'Disponível', foto:'1600210492486-724fe5c67fb0',
+      endereco:'Rua das Acácias, 300 — Jardim Europa', quartos:3, suites:1, banheiros:2, vagas:2, andar:'8º andar', condominio:780,
+      descricao:'Apartamento com varanda gourmet e lazer completo no condomínio.',
+      ambientes:['Sala de estar e jantar','Varanda gourmet','Cozinha','3 quartos, sendo 1 suíte','Banheiro social','Área de serviço'],
+      diferenciais:['Piscina no condomínio','Elevador','Portaria 24 horas','Aceita financiamento'],
+      galeria:[['sala',1],['cozinha'],['quarto'],['varanda','Varanda gourmet']] },
+    { nome:'Apto 1 quarto — Centro', captador:2, cadastro:'2026-11-03', tipo:'Apartamento', valor:215000, area:42, status:'Disponível', foto:'1502672260266-1c1ef2d93688',
+      endereco:'Rua Marechal Deodoro, 150 — Centro', quartos:1, suites:0, banheiros:1, vagas:0, andar:'3º andar', condominio:380,
+      descricao:'Apartamento compacto, ideal para investimento ou primeiro imóvel.',
+      ambientes:['Sala integrada','Cozinha americana','1 quarto','Banheiro','Área de serviço'],
+      diferenciais:['Elevador','Aceita financiamento','Perto do comércio'],
+      galeria:[['sala',0],['cozinha'],['quarto']] },
+    { nome:'Casa com piscina — Vila Nova', captador:4, cadastro:'2026-10-22', tipo:'Casa', valor:890000, area:240, status:'Disponível', foto:'1570129477492-45c003edd2be',
+      endereco:'Rua dos Ipês, 48 — Vila Nova', quartos:4, suites:2, banheiros:4, vagas:3, terreno:420,
+      descricao:'Casa espaçosa com piscina, área gourmet e jardim.',
+      ambientes:['Sala de estar','Sala de jantar','Cozinha planejada','4 quartos, sendo 2 suítes','Lavabo','Área gourmet com churrasqueira','Piscina','Jardim'],
+      diferenciais:['Piscina','Área gourmet','Aquecimento solar','Aceita financiamento'],
+      galeria:[['sala',3],['cozinha'],['quarto','Suíte'],['varanda','Área gourmet']] },
+    { nome:'Terreno 500 m² — Jardim Europa', captador:7, cadastro:'2026-09-28', tipo:'Terreno', valor:280000, area:500, status:'Disponível', foto:'1500382017468-9049fed747ef',
+      endereco:'Rua das Orquídeas, lote 7 — Jardim Europa', frente:15, fundo:33,
+      descricao:'Terreno de esquina em bairro nobre, pronto para construir.',
+      ambientes:['Terreno de esquina','15 m de frente por 33 m de fundo','Rua asfaltada','Água, luz e esgoto na rua'],
+      diferenciais:['Documentação em dia','Zona residencial'],
+      galeria:[] },
+    { nome:'Sala comercial — Centro', captador:3, cadastro:'2026-11-18', tipo:'Comercial', valor:165000, area:32, status:'Disponível', foto:'1497366216548-37526070297c',
+      endereco:'Rua XV de Novembro, 1.050, sala 302 — Centro', banheiros:1, vagas:0, andar:'3º andar', condominio:350,
+      descricao:'Sala pequena e bem localizada, boa para consultório ou escritório.',
+      ambientes:['Sala de atendimento','Copa','Banheiro'],
+      diferenciais:['Elevador','Portaria 24 horas','Aceita financiamento'],
+      galeria:[] },
+    { nome:'Casa 2 quartos — Bela Vista', captador:6, cadastro:'2026-08-08', tipo:'Casa', valor:360000, area:90, status:'Em negociação', foto:'1600585154340-be6161a56a0c',
+      endereco:'Rua Projetada 2, 210 — Bela Vista', quartos:2, suites:0, banheiros:1, vagas:1, terreno:200,
+      descricao:'Casa simples e bem conservada, com quintal.',
+      ambientes:['Sala','Cozinha','2 quartos','Banheiro','Área de serviço','Quintal'],
+      diferenciais:['Aceita financiamento','Quintal'],
+      galeria:[['sala',6],['cozinha'],['quarto']] },
+  ],
+  lancamentos:[
+    { nome:'Residencial Jardins', entrega:'Dez/2028', endereco:'Rua das Palmeiras, 450 — Jardins', foto:'1574362848149-11496d93a7c7',
+      descricao:'Prédio residencial com 3 andares, área de lazer com piscina, academia e salão de festas.',
+      unidades: Array.from({length:12},(_,i)=>{
+        const andar = Math.floor(i/4)+1, grande = i%2===1;
+        return {
+          num: andar*100 + (i%4)+1, andar,
+          quartos: grande ? 3 : 2, suites: 1, banheiros: grande ? 2 : 1, vagas: grande ? 2 : 1,
+          area: grande ? 82 : 64,
+          valor: (grande ? 540000 : 410000) + (andar-1)*15000,
+          sol: i%4 < 2 ? 'Sol da manhã' : 'Sol da tarde',
+          st: [0,5,9].includes(i) ? 'vend' : [3,7].includes(i) ? 'res' : 'disp',
+          foto: FOTOS_SALA[i % FOTOS_SALA.length],
+        };
+      }) },
+  ],
+};
+
+/* ===================== VENDAS, PARCELAS E COMISSÃO ===================== */
+// A comissão cai aos poucos: cada pagamento recebido (entrada ou parcela) libera a comissão relativa a ele.
+function somaMeses(meses){ const d = new Date(agora); d.setDate(10); d.setMonth(d.getMonth()+meses); d.setHours(0,0,0,0); return d; }
+function montarVenda({imovel,cliente,valor,entrada,parcelas,pagas=0,contrato='Contrato — / NF —',inicio=0,taxa=TAXA_PADRAO,vendedor=null,captador=null}){
+  const pagamentos = [{ nome: parcelas ? 'Entrada' : 'Pagamento à vista', valor: entrada, venc: somaMeses(inicio), pago: pagas>0 }];
+  if (parcelas){
+    const resto = valor - entrada;
+    const base = Math.floor(resto/parcelas*100)/100;
+    for (let i=1;i<=parcelas;i++){
+      const v = i===parcelas ? Math.round((resto - base*(parcelas-1))*100)/100 : base;
+      pagamentos.push({ nome:`Parcela ${i}/${parcelas}`, valor:v, venc: somaMeses(inicio+i), pago: i < pagas });
+    }
+  }
+  return { imovel, cliente, valor, contrato, taxa, pagamentos, vendedor, captador, taxaCaptacao:TAXA_CAPTACAO, data: somaMeses(inicio) };
+}
+/* controle mensal das comissões */
+const NOMES_MES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const chaveMes = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+const nomeMes  = k => { const [a,m] = k.split('-'); return `${NOMES_MES[m-1]} de ${a}`; };
+const mesAtualFin = () => estado.mesFin || chaveMes(agora);
+function mesesFin(){
+  const s = new Set([chaveMes(agora)]);
+  estado.vendas.forEach(v=>{ s.add(chaveMes(v.data)); v.pagamentos.forEach(p=>s.add(chaveMes(p.venc))); });
+  return [...s].sort();
+}
+function resumoMes(k){
+  const vendas = estado.vendas.filter(v=>chaveMes(v.data)===k);
+  const pags = estado.vendas.flatMap(v=>v.pagamentos.filter(p=>chaveMes(p.venc)===k).map(p=>({v,p})));
+  const prevista = pags.reduce((s,{v,p})=>s+p.valor*v.taxa,0);
+  const recebida = pags.filter(({p})=>p.pago).reduce((s,{v,p})=>s+p.valor*v.taxa,0);
+  return { vendas, pags, comVendas: vendas.reduce((s,v)=>s+comTotal(v),0), prevista, recebida, aReceber: prevista-recebida };
+}
+// Quem captou o cliente leva uma parte da comissão, mesmo que não faça a venda.
+const comCaptacao = v => (v.captador && v.captador!==v.vendedor) ? comTotal(v)*v.taxaCaptacao : 0;
+const corretor = id => estado.corretores.find(c=>c.id===id);
+const nomeCor  = id => corretor(id)?.nome || '—';
+const clientePorNome = n => estado.clientes.find(c=>c.nome===n);
+const carteira = id => estado.clientes.filter(c=>c.captador===id);
+const comTotal    = v => v.valor * v.taxa;
+const valRecebido = v => v.pagamentos.filter(p=>p.pago).reduce((s,p)=>s+p.valor,0);
+const comRecebida = v => valRecebido(v) * v.taxa;
+const comAReceber = v => comTotal(v) - comRecebida(v);
+const quitada     = v => v.pagamentos.every(p=>p.pago);
+const formaPag    = v => v.pagamentos.length===1 ? 'À vista' : `Entrada + ${v.pagamentos.length-1}x`;
+const fmtData     = d => d.toLocaleDateString('pt-BR');
+const real2       = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+function situacaoPag(p){
+  if (p.pago) return ['Pago','s-recebido'];
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  if (p.venc < hoje) return ['Atrasado','s-atrasado'];
+  return ['A receber','s-receber'];
+}
+
+/* ===================== ALERTAS DAS TAREFAS ===================== */
+// rosa = falta até 60 min para a hora marcada; vermelho = passou da hora e não foi marcada como realizada
+function situacao(t){
+  if (t.feita) return 'feita';
+  const diff = (t.quando - new Date())/60000;
+  if (diff < 0) return 'atrasada';
+  if (diff <= 60) return 'atencao';
+  return 'normal';
+}
+const atrasadas = () => estado.tarefas.filter(t=>situacao(t)==='atrasada').length;
+
+/* ===================== RENDER ===================== */
+const $ = s => document.querySelector(s);
+
+function renderAbas(){
+  $('#abas').innerHTML = ABAS.map(a =>
+    `<button class="aba ${a.id===estado.aba?'ativa':''}" data-aba="${a.id}">${a.id==='zani'?'<span class="bolinha"></span>':''}${a.nome}</button>`).join('');
+}
+
+function renderMenu(){
+  if (estado.aba==='sitio'){ // a aba Sítio tem só o Financeiro
+    $('#menu').innerHTML = `<button class="item ativo" data-aba="sitio">${MENU.find(m=>m.id==='financeiro').icone}Financeiro</button>`;
+    return;
+  }
+  const conts = { negociacao: estado.negocios.length, tarefas: estado.tarefas.filter(t=>!t.feita).length };
+  $('#menu').innerHTML = MENU.map(m => {
+    let c = '';
+    if (m.id==='tarefas' && atrasadas()) c = `<span class="cont alerta">${atrasadas()}</span>`;
+    else if (conts[m.id]) c = `<span class="cont">${conts[m.id]}</span>`;
+    return `<button class="item ${m.id===estado.menu?'ativo':''}" data-menu="${m.id}">${m.icone}${m.nome}${c}</button>`;
+  }).join('');
+}
+
+function cab(titulo, desc, extra=''){
+  const aba = ABAS.find(a=>a.id===estado.aba).nome;
+  const menu = estado.aba==='sitio' ? 'Financeiro' : MENU.find(m=>m.id===estado.menu).nome;
+  return `<div class="cab"><div><div class="trilha">${aba} › ${menu}</div><h1>${titulo}</h1><p>${desc}</p></div>${extra}</div>`;
+}
+const fluxo = itens => `<div class="fluxo">${itens.map(i =>
+  i==='→' ? '<span class="seta">→</span>' : `<span class="etapa ${i.c||''}">${i.t||i}</span>`).join('')}</div>`;
+
+const TELAS = {
+  inicio(){
+    const receber = estado.vendas.reduce((s,v)=>s+comAReceber(v),0);
+    const proximas = estado.tarefas.filter(t=>!t.feita).sort((a,b)=>a.quando-b.quando).slice(0,3);
+    return cab(saudacao()+', Lucas','Resumo do dia da imobiliária.') + `
+    <div class="grade g4">
+      ${kpi('Negociações ativas', estado.negocios.length, 'no funil de vendas', 'var(--amarelo)')}
+      ${kpi('Comissão a receber', real(receber), 'aguardando pagamento', 'var(--laranja)')}
+      ${kpi('Tarefas atrasadas', atrasadas(), 'não marcadas como realizadas', 'var(--vermelho)')}
+      ${kpi('Imóveis disponíveis', estado.imoveis.filter(i=>i.status==='Disponível').length, 'na carteira', 'var(--azul)')}
+    </div>
+    <div class="grade g2" style="margin-top:16px">
+      <div class="cartao"><h3>Funil de negociação</h3>
+        ${ETAPAS.map(e=>{const n=estado.negocios.filter(x=>x.etapa===e.id).length;
+          return `<div style="display:flex;align-items:center;gap:10px;margin:8px 0">
+            <span style="width:150px;font-size:13px">${e.nome}</span>
+            <div style="flex:1;height:10px;background:#eceef2;border-radius:6px"><div style="width:${n/estado.negocios.length*100}%;height:100%;background:var(--amarelo);border-radius:6px"></div></div>
+            <b style="width:20px;text-align:right">${n}</b></div>`}).join('')}
+        <button class="btn sec peq" data-ir="negociacao" style="margin-top:8px">Abrir negociação →</button>
+      </div>
+      <div class="cartao"><h3>Próximas tarefas</h3>
+        ${proximas.map(linhaTarefa).join('') || '<p style="color:var(--muted)">Nenhuma tarefa pendente.</p>'}
+        <button class="btn sec peq" data-ir="tarefas">Ver todas →</button>
+      </div>
+    </div>`;
+  },
+
+  financeiro(){
+    const sub = estado.sub.financeiro || 'vendas';
+    const mes = mesAtualFin(), todos = mes==='todos';
+    const R = todos ? null : resumoMes(mes);
+    const V = todos ? estado.vendas : R.vendas;
+    const soma = f => estado.vendas.reduce((s,v)=>s+f(v),0);
+    const noMes = todos ? '' : ' em '+nomeMes(mes);
+    let corpo;
+
+    if (sub==='vendas'){
+      corpo = !V.length ? `<p style="color:var(--muted)">Nenhuma venda fechada${noMes}.</p>` : `<table><thead><tr><th>Data da venda</th><th>Imóvel</th><th>Cliente</th><th>Corretor / Captação</th><th>Forma</th><th>Valor da venda</th><th>Comissão total</th><th>Comissão recebida</th><th>Andamento</th></tr></thead><tbody>
+      ${[...V].sort((a,b)=>b.data-a.data).map(v=>{const pct=Math.round(valRecebido(v)/v.valor*100);return `<tr><td style="white-space:nowrap"><b>${fmtData(v.data)}</b></td><td>${v.imovel}<br><small style="color:var(--muted)">${v.contrato}</small></td><td>${v.cliente}</td>
+        <td>${nomeCor(v.vendedor)}<br><small style="color:var(--muted)">${comCaptacao(v)?'Captação: '+nomeCor(v.captador):'Captou e vendeu'}</small></td><td>${formaPag(v)}</td>
+        <td>${real2(v.valor)}</td><td>${real2(comTotal(v))}</td><td><b>${real2(comRecebida(v))}</b></td>
+        <td style="min-width:120px"><div class="barra"><div style="width:${pct}%"></div></div><small style="color:var(--muted)">${pct}% pago</small></td></tr>`}).join('')}
+      </tbody></table>`;
+    }
+
+    if (sub==='receber'){
+      const abertas = todos ? estado.vendas.filter(v=>!quitada(v))
+        : estado.vendas.filter(v=>v.pagamentos.some(p=>!p.pago && chaveMes(p.venc)===mes));
+      corpo = abertas.map(v=>{
+        const vi = estado.vendas.indexOf(v);
+        const doMes = todos ? [] : v.pagamentos.filter(p=>!p.pago && chaveMes(p.venc)===mes);
+        const pct = Math.round(valRecebido(v)/v.valor*100);
+        const entrada = v.pagamentos[0], parc = v.pagamentos.slice(1);
+        return `<div class="venda">
+          <div class="venda-cab"><div><b style="font-size:15px">${v.imovel}</b><div style="color:var(--muted);font-size:12px;margin-top:2px">${v.cliente} · ${v.contrato}</div></div>
+            <label class="taxa">Comissão <input type="number" min="0" max="100" step="0.5" value="${+(v.taxa*100).toFixed(2)}" data-taxa="${vi}"> %</label></div>
+          <div class="resumo">
+            <div><span>Valor total da venda</span><b>${real2(v.valor)}</b></div>
+            <div><span>Entrada</span><b>${real2(entrada.valor)}</b></div>
+            <div><span>Parcelas</span><b>${parc.length ? parc.length+'x de '+real2(parc[0].valor) : 'À vista'}</b></div>
+            <div><span>Comissão total</span><b>${real2(comTotal(v))}</b></div>
+            <div><span>Comissão recebida</span><b style="color:var(--verde)">${real2(comRecebida(v))}</b></div>
+            <div><span>Comissão a receber</span><b style="color:#b26b00">${real2(comAReceber(v))}</b></div>
+          </div>
+          ${doMes.length ? `<div class="no-mes">${ICO.cal} <span>Vence em ${NOMES_MES[+mes.slice(5)-1].toLowerCase()}: <b>${doMes.map(p=>p.nome).join(', ')}</b> · ${real2(doMes.reduce((s,p)=>s+p.valor,0))} · comissão <b>${real2(doMes.reduce((s,p)=>s+p.valor*v.taxa,0))}</b></span></div>` : ''}
+          <div class="divisao">
+            <span>${ICO.user} Corretor da venda: <b>${nomeCor(v.vendedor)}</b></span>
+            ${(v.captador && v.captador!==v.vendedor)
+              ? `<span>${ICO.link} Captação: <b>${nomeCor(v.captador)}</b> recebe
+                  <label class="taxa"><input type="number" min="0" max="100" step="0.5" value="${+(v.taxaCaptacao*100).toFixed(2)}" data-taxa-cap="${vi}" title="Percentual da comissão que vai para quem captou"> % da comissão</label>
+                  = <b>${real2(comCaptacao(v))}</b> <small>(${real2(comCaptacao(v)*valRecebido(v)/v.valor)} já liberado)</small></span>`
+              : `<span>${ICO.link} Captação: <b>${nomeCor(v.captador)}</b> <small>(mesmo corretor da venda)</small></span>`}
+          </div>
+          <div class="barra" style="margin:4px 0 12px"><div style="width:${pct}%"></div></div>
+          ${(()=>{const pagos=v.pagamentos.filter(p=>p.pago).length, prox=v.pagamentos.find(p=>!p.pago), aberto=estado.abertos.has(v);
+            return `<button class="abrir ${aberto?'aberto':''}" data-abrir="${vi}">
+              <span><b>${aberto?'Esconder':'Ver'} andamento das parcelas</b> · ${pagos} de ${v.pagamentos.length} pagas${prox?` · próxima: ${prox.nome} em ${fmtData(prox.venc)}`:''}</span><span class="seta-abrir">▾</span></button>`})()}
+          ${!estado.abertos.has(v) ? '' : `<div class="lista-mob" style="margin-top:10px">${v.pagamentos.map((p,pi)=>{const [t,c]=situacaoPag(p);return `<div class="item-mob ${p.pago?'pago':''}">
+              <div class="l1"><b>${p.nome}</b><b class="valor">${real2(p.valor)}</b></div>
+              <div class="l2"><span>Vence ${fmtData(p.venc)}</span><span class="status ${c}">${t}</span><span class="dir">Comissão ${real2(p.valor*v.taxa)}</span></div>
+              <button class="btn ${p.pago?'sec':''} peq larga" data-pagar="${vi}:${pi}">${p.pago?'Desfazer pagamento':'Marcar como pago'}</button>
+            </div>`}).join('')}</div>
+          <table class="so-desktop" style="margin-top:10px"><thead><tr><th>Pagamento</th><th>Vencimento</th><th>Valor</th><th>Comissão (${+(v.taxa*100).toFixed(2)}%)</th><th>Situação</th><th></th></tr></thead><tbody>
+          ${v.pagamentos.map((p,pi)=>{const [t,c]=situacaoPag(p);return `<tr class="${p.pago?'linha-paga':''}"><td>${p.nome}</td><td>${fmtData(p.venc)}</td><td>${real2(p.valor)}</td>
+            <td><b>${real2(p.valor*v.taxa)}</b></td><td><span class="status ${c}">${t}</span></td>
+            <td>${p.pago?`<button class="btn sec peq" data-pagar="${vi}:${pi}">Desfazer</button>`:`<button class="btn peq" data-pagar="${vi}:${pi}">Marcar como pago</button>`}</td></tr>`}).join('')}
+          </tbody></table>`}</div>`;
+      }).join('') || `<p style="color:var(--muted)">Nenhum valor a receber${noMes}.</p>`;
+    }
+
+    if (sub==='recebido'){
+      const recebidos = estado.vendas.flatMap(v=>v.pagamentos.filter(p=>p.pago && (todos || chaveMes(p.venc)===mes)).map(p=>({v,p}))).sort((a,b)=>b.p.venc-a.p.venc);
+      corpo = !recebidos.length ? `<p style="color:var(--muted)">Nenhum pagamento recebido${noMes}.</p>` : `<table><thead><tr><th>Data</th><th>Imóvel</th><th>Cliente</th><th>Pagamento</th><th>Valor recebido</th><th>Comissão liberada</th></tr></thead><tbody>
+      ${recebidos.map(({v,p})=>`<tr><td>${fmtData(p.venc)}</td><td>${v.imovel}</td><td>${v.cliente}</td><td>${p.nome}</td><td>${real2(p.valor)}</td><td><b style="color:var(--verde)">${real2(p.valor*v.taxa)}</b></td></tr>`).join('')}
+      </tbody></table>`;
+    }
+
+    if (sub==='mensal'){
+      const lista = mesesFin().map(k=>({k,...resumoMes(k)}));
+      const t = f => lista.reduce((s,r)=>s+r[f],0);
+      const hoje = chaveMes(agora);
+      corpo = `<p style="color:var(--muted);margin:0 0 12px">Comissão de cada mês: das vendas fechadas no mês e das parcelas que vencem no mês. Toque em um mês para ver os detalhes.</p>
+      <table class="mensal"><thead><tr><th>Mês</th><th>Vendas fechadas</th><th class="num">Comissão das vendas</th><th class="num">Comissão prevista</th><th class="num">Recebida</th><th class="num">A receber</th><th></th></tr></thead><tbody>
+      ${lista.map(r=>`<tr class="${r.k===mes?'mes-sel':''}"><td><b>${nomeMes(r.k)}</b>${r.k===hoje?' <span class="status s-recebido">Mês atual</span>':''}</td>
+        <td>${r.vendas.length || '—'}</td><td class="num">${real2(r.comVendas)}</td><td class="num">${real2(r.prevista)}</td>
+        <td class="num"><b style="color:var(--verde)">${real2(r.recebida)}</b></td>
+        <td class="num"><b style="color:${r.aReceber>0.005 && r.k<hoje ? 'var(--vermelho)' : '#b26b00'}">${real2(r.aReceber)}</b>${r.aReceber>0.005 && r.k<hoje?' <small style="color:var(--vermelho)">atrasada</small>':''}</td>
+        <td><button class="btn sec peq" data-mes-ir="${r.k}">Ver mês</button></td></tr>`).join('')}
+      <tr class="linha-total"><td><b>Total</b></td><td>${estado.vendas.length}</td><td class="num"><b>${real2(t('comVendas'))}</b></td><td class="num"><b>${real2(t('prevista'))}</b></td><td class="num"><b>${real2(t('recebida'))}</b></td><td class="num"><b>${real2(t('aReceber'))}</b></td><td></td></tr>
+      </tbody></table>`;
+    }
+
+    const meses = mesesFin(), im = meses.indexOf(mes);
+    const seletorMes = `<div class="mes-bar">
+      <button class="passo" data-mes-passo="-1" aria-label="Mês anterior" ${!todos && im<=0?'disabled':''}>‹</button>
+      <select data-mes-fin aria-label="Mês">
+        ${meses.map(k=>`<option value="${k}" ${k===mes?'selected':''}>${nomeMes(k)}</option>`).join('')}
+        <option value="todos" ${todos?'selected':''}>Todos os meses</option>
+      </select>
+      <button class="passo" data-mes-passo="1" aria-label="Próximo mês" ${!todos && im>=meses.length-1?'disabled':''}>›</button>
+    </div>`;
+    const kpis = todos ? `
+      ${kpi('Comissão total das vendas', real2(soma(comTotal)), estado.vendas.length+' vendas', 'var(--amarelo)')}
+      ${kpi('Comissão a receber', real2(soma(comAReceber)), 'cai conforme as parcelas são pagas', 'var(--laranja)')}
+      ${kpi('Comissão recebida', real2(soma(comRecebida)), 'já liberada', 'var(--verde)')}` : `
+      ${kpi('Comissão das vendas do mês', real2(R.comVendas), R.vendas.length ? R.vendas.length+' venda'+(R.vendas.length>1?'s':'')+' fechada'+(R.vendas.length>1?'s':'') : 'nenhuma venda fechada', 'var(--amarelo)')}
+      ${kpi('Comissão a receber no mês', real2(R.aReceber), R.aReceber>0.005 && mes<chaveMes(agora) ? 'atrasada: pagamentos não recebidos' : 'parcelas que vencem no mês', R.aReceber>0.005 && mes<chaveMes(agora) ? 'var(--vermelho)' : 'var(--laranja)')}
+      ${kpi('Comissão recebida no mês', real2(R.recebida), 'de '+real2(R.prevista)+' prevista no mês', 'var(--verde)')}`;
+
+    return cab('Financeiro','Vendas, valores a receber, recebidos e comissões. A comissão é liberada a cada pagamento recebido.', `<button class="btn" data-acao="comissao">Gerar comissão</button>`) +
+    fluxo([{t:'Contrato / Nota fiscal',c:'out'},'→','Vendas','→','A receber','→','Recebido']) + `
+    ${seletorMes}
+    <div class="grade g3" style="margin-bottom:16px">${kpis}</div>
+    <div class="cartao">
+      ${subabas('financeiro',[['vendas','Vendas'],['receber','A receber'],['recebido','Recebido'],['mensal','Por mês']],sub)}
+      ${corpo}
+    </div>`;
+  },
+
+  negociacao(){
+    return cab('Negociação','Do primeiro contato ao fechamento do negócio. "Avançar" passa para a próxima etapa; "Descartar" manda para o Cadastro de interesse.', `<button class="btn" data-acao="novo-negocio">+ Novo interessado</button>`) +
+    fluxo([{t:'Instagram',c:'out'},'→',...ETAPAS.flatMap((e,i)=>i?['→',e.nome]:[e.nome]),'→',{t:'Contrato / NF',c:'out'}]) + `
+    <div class="etapas-chips" role="tablist" aria-label="Etapas da negociação">
+      ${ETAPAS.map(e=>`<button role="tab" class="${estado.etapaMob===e.id?'ativa':''}" data-etapa-mob="${e.id}">${e.nome}<b>${estado.negocios.filter(n=>n.etapa===e.id).length}</b></button>`).join('')}
+    </div>
+    <div class="kanban">
+      ${ETAPAS.map((e,idx)=>{const itens=estado.negocios.filter(n=>n.etapa===e.id);
+        return `<div class="coluna ${estado.etapaMob===e.id?'mob-ativa':''}"><h4>${e.nome}<span>${itens.length}</span></h4>
+        ${itens.length ? '' : '<p class="vazio-col">Nenhum cliente nesta etapa.</p>'}
+        ${itens.map(n=>{
+          const cap = clientePorNome(n.cliente)?.captador;
+          const ultimo = idx===ETAPAS.length-1;
+          return `<div class="card-neg"><b>${n.cliente}</b><small>${n.imovel}</small>
+          <div style="display:flex;justify-content:space-between;align-items:center"><span class="tag ${n.origem==='Instagram'?'insta':''}">${n.origem}</span>${n.tel?zap(n.cliente,n.tel,true):''}</div>
+          ${n.corretor
+            ? `<button class="corretor-linha" data-encaminhar="${n.id}" title="Trocar corretor">${ICO.user} ${nomeCor(n.corretor)} <span>trocar</span></button>`
+            : `<div class="corretor-linha espera">Aguardando encaminhamento do Lucas</div>`}
+          ${cap ? `<div class="captado">Captado por ${nomeCor(cap)}</div>` : ''}
+          ${ultimo ? (n.reuniao
+            ? `<button class="reuniao marcada" data-reuniao="${n.id}">${ICO.cal} ${fmtData(n.reuniao.quando)} às ${fmtHora(n.reuniao.quando)}<small>${n.reuniao.local} · com Lucas</small></button>`
+            : `<button class="reuniao" data-reuniao="${n.id}">${ICO.cal} Agendar reunião de fechamento</button>`) : ''}
+          <div class="acoes" style="margin-top:10px">
+            <button class="joia" data-avancar="${n.id}">${ultimo?'Fechar negócio':idx===0?'Encaminhar':'Avançar'}</button>
+            <button class="naojoia" data-perder="${n.id}">Descartar</button>
+          </div></div>`}).join('')}
+        </div>`}).join('')}
+    </div>
+    <div class="cartao" style="margin-top:20px"><h3>Cadastro de interesse</h3>
+      <p style="color:var(--muted);margin-top:-6px">Clientes que saíram do funil. Ficam guardados para oferecer outros imóveis depois.</p>
+      <table><thead><tr><th>Cliente</th><th>Imóvel</th><th>Saiu na etapa</th><th>Motivo</th></tr></thead><tbody>
+      ${estado.interesse.map(c=>`<tr><td>${c.cliente}</td><td>${c.imovel}</td><td>${c.saiuEm}</td><td>${c.motivo}</td></tr>`).join('')}
+      </tbody></table>
+    </div>`;
+  },
+
+  cadastro(){
+    const sub = estado.sub.cadastro || 'clientes';
+    let tabela;
+    if (sub==='clientes') tabela = tab(['Nome','Telefone','Perfil','Carteira do corretor','Procura',''], estado.clientes.map(c=>[`<button class="link-cli" data-ficha="${esc(c.nome)}">${c.nome}</button>`,c.tel,c.perfil,
+      c.captador ? `<span class="tag">${nomeCor(c.captador)}</span>` : '<small style="color:var(--muted)">Ainda não captado</small>',
+      c.busca ? `<small>${textoBusca(c.busca)}</small><br><button class="btn sec peq" data-para-cliente="${c.nome}" style="margin-top:6px">Imóveis para este cliente</button>` : '<small style="color:var(--muted)">—</small>',
+      `<div class="acoes-cli">${zap(c.nome,c.tel)}<button class="btn sec peq btn-msg" data-mensagens="${c.nome}">Mensagens</button></div>`]));
+    if (sub==='corretor') tabela = `<p style="color:var(--muted);margin:0 0 12px">O cliente entra na carteira do corretor que o captou na visita. Se outro corretor fizer a venda, quem captou recebe ${TAXA_CAPTACAO*100}% da comissão.</p>` +
+      tab(['Nome','CRECI','Função','Carteira de clientes','Em atendimento',''], estado.corretores.map(c=>{
+        const cart = carteira(c.id), atend = estado.negocios.filter(n=>n.corretor===c.id).length;
+        return [`<b>${c.nome}</b>${c.email?`<br><small style="color:var(--muted)">${c.email}</small>`:''}`, c.creci || '—', c.funcao,
+          cart.length ? `<b>${cart.length}</b> <small style="color:var(--muted)">${cart.map(x=>x.nome).join(', ')}</small>` : '<small style="color:var(--muted)">Nenhum cliente</small>',
+          atend, `<div class="acoes-cli">${zap(c.nome,c.tel)}<button class="btn sec peq" data-editar-cor="${c.id}">Editar</button></div>`];
+      }));
+    if (sub==='imoveis')  tabela = tab(['Imóvel','Tipo','Área','Valor','Status'], estado.imoveis.map(i=>[i.nome,i.tipo,i.area+' m²',real(i.valor),i.status]));
+    const rot = {clientes:'cliente',corretor:'corretor',imoveis:'imóvel'}[sub];
+    return cab('Cadastro','Clientes, corretores e imóveis.', `<button class="btn" data-acao="cadastrar">+ Cadastrar ${rot}</button>`) +
+    `<div class="cartao">${subabas('cadastro',[['clientes','Clientes'],['corretor','Corretor'],['imoveis','Imóveis']],sub)}${tabela}</div>`;
+  },
+
+  imoveis(){
+    const F = filtroImo(), lista = imoveisFiltrados(), tags = tagsFiltro(), n = qtdFiltros();
+    const cli = F.paraCliente;
+    return cab('Imóveis','Carteira de imóveis da imobiliária. Toque em um imóvel para ver os detalhes e mudar o status.', `<button class="btn" data-acao="novo-imovel">+ Cadastrar imóvel</button>`) + `
+    ${cli ? `<div class="faixa-cliente">${ICO.user}<span>Imóveis para o perfil de <b>${cli}</b>: ${textoBusca(clientePorNome(cli)?.busca)}</span><button class="btn sec peq" data-limpar-filtros>Ver todos</button></div>` : ''}
+    <div class="barra-filtros">
+      <button class="btn sec btn-filtros" data-abrir-filtros>${ICO.filtro} Filtros${n?` <span class="qtd">${n}</span>`:''}</button>
+      <label class="ordenar">Ordenar por <select data-ordem-imo>${ORDENS_IMO.map(([k,t])=>`<option value="${k}" ${F.ordem===k?'selected':''}>${t}</option>`).join('')}</select></label>
+      <span class="total-filtro">${plural(lista.length,'imóvel','imóveis')}</span>
+    </div>
+    ${tags.length ? `<div class="tags-filtro">${tags.map(([t,k])=>`<button class="tag-filtro" data-tira-filtro="${k}" aria-label="Remover filtro ${t}">${t} ${ICO.x}</button>`).join('')}<button class="limpar-tudo" data-limpar-filtros>Limpar tudo</button></div>` : ''}
+    ${!lista.length ? `<div class="cartao vazio-filtro"><b>Nenhum imóvel encontrado com esses filtros.</b><p>Tente tirar algum filtro ou ampliar a faixa de valor.</p><button class="btn sec" data-limpar-filtros>Limpar filtros</button></div>` : ''}
+    <div class="grade g3">${lista.map(i=>{const ix = estado.imoveis.indexOf(i); return `<button class="cartao card-imovel" data-imovel="${ix}" aria-label="Ver detalhes: ${i.nome}">
+      <div class="foto">${i.foto ? `<img src="${foto(i.foto,600)}" alt="" loading="lazy">` : `<span class="sem-foto">Sem foto</span>`}${i.videos?.length ? `<span class="tem-video">${ICO.video} ${i.videos.length}</span>` : ""}<span class="tipo">${categoriaImovel(i)}</span></div>
+      <b>${i.nome}</b><div style="color:var(--muted);margin:4px 0 8px">${i.area} m² · ${real(i.valor)}</div>
+      ${resumoImovel(i) ? `<div class="mini-info">${resumoImovel(i)}</div>` : ''}
+      <div class="card-pe"><span class="status ${statusImovel(i.status)}">${i.status}</span><span class="ver-det">Ver detalhes ›</span></div></button>`}).join('')}</div>` + janelaImovel() + janelaFiltros();
+  },
+
+  tarefas(){
+    const ord = [...estado.tarefas].sort((a,b)=>a.feita-b.feita || a.quando-b.quando);
+    return cab('Tarefas','Lista de tarefas com avisos automáticos.', `<button class="btn" data-acao="nova-tarefa">+ Nova tarefa</button>`) + `
+    <div class="legenda"><span><i style="background:var(--amarelo)"></i>Aviso de atenção: a hora marcada está chegando (menos de 1 h)</span>
+      <span><i style="background:var(--vermelho)"></i>Alerta: passou da hora e não foi marcada como realizada</span></div>
+    <div class="cartao">${ord.map(linhaTarefa).join('')}</div>`;
+  },
+
+  lancamentos(){
+    return cab('Lançamentos','Vendas de imóveis na planta.', `<button class="btn" data-acao="novo-lancamento">+ Novo lançamento</button>`) +
+    estado.lancamentos.map(l=>{
+      const c = s=>l.unidades.filter(u=>u.st===s).length;
+      return `<div class="cartao">
+      <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
+        <div class="foto" style="width:320px;max-width:100%;height:200px;margin:0"><img src="${foto(l.foto,800)}" alt="${l.nome}"></div>
+        <div style="flex:1;min-width:220px"><h3 style="margin:0">${l.nome}</h3><div style="color:var(--muted);margin-top:4px">${l.endereco}<br>Entrega prevista: ${l.entrega} · ${l.unidades.length} unidades</div>
+        <p style="margin:8px 0 0">${l.descricao}</p>
+        <div style="margin-top:8px;display:flex;gap:8px"><span class="status s-recebido">${c('disp')} disponíveis</span><span class="status s-receber">${c('res')} reservadas</span><span class="status" style="background:#fdecec;color:var(--vermelho)">${c('vend')} vendidas</span></div></div>
+      </div>
+      <label class="sel-unid"><span>Unidades na planta</span>
+        <select class="sel-f" data-sel-unidade="${estado.lancamentos.indexOf(l)}" aria-label="Escolher unidade de ${esc(l.nome)}">
+          <option value="">Escolha uma unidade</option>
+          ${Object.entries(ST_UNID).map(([st,nomeSt])=>{ const us = l.unidades.map((u,ui)=>[u,ui]).filter(([u])=>u.st===st); return us.length ? `<optgroup label="${({disp:'Disponíveis',res:'Reservadas',vend:'Vendidas'})[st]} (${us.length})">${us.map(([u,ui])=>`<option value="${ui}" ${estado.unidade && estado.unidade[0]===estado.lancamentos.indexOf(l) && estado.unidade[1]===ui ? 'selected':''}>Unidade ${u.num} · ${u.quartos} quartos · ${u.area} m² · ${real(u.valor)}${u.cliente && u.st!=='disp' ? ' · '+esc(u.cliente) : ''}</option>`).join('')}</optgroup>` : ''; }).join('')}
+        </select></label>
+    </div>`}).join('') + janelaUnidade();
+  },
+};
+
+// Janelas da Negociação: encaminhar para corretor e agendar reunião de fechamento
+const botoesJanela = rot => `<div class="botoes"><button class="btn sec" data-fechar>Cancelar</button><button class="btn" data-confirmar>${rot}</button></div>`;
+const isoData = q => `${q.getFullYear()}-${String(q.getMonth()+1).padStart(2,'0')}-${String(q.getDate()).padStart(2,'0')}`;
+const numBR = s => Number(String(s).trim().replace(/\./g,'').replace(',','.'));
+
+// Aviso rápido no canto da tela (no lugar das janelinhas do navegador)
+function avisar(msg){
+  document.querySelectorAll('.toast').forEach(x=>x.remove()); // mostra só o aviso mais recente
+  const t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role','status'); t.textContent = msg;
+  document.body.appendChild(t); setTimeout(()=>t.remove(), 4500);
+}
+
+function janelaForm(){
+  const j = estado.janela; if (!j) return '';
+  const n = estado.negocios.find(x=>x.id===j.neg);
+  if (['encaminhar','reuniao','fechar','descartar'].includes(j.tipo) && !n) return '';
+  let corpo;
+  const erro = j.erro ? `<p class="erro">${j.erro}</p>` : '';
+  if (j.tipo==='sitio-gasto'){
+    corpo = `<h2 style="margin:0">Novo gasto do sítio</h2>
+      <p style="color:var(--muted);margin:4px 0 16px">O valor é dividido entre os sócios conforme a divisão da sociedade.</p>
+      <div class="campos">
+        <label class="largo">Descrição<input type="text" id="g-desc" placeholder="Ex.: Arame para a cerca"></label>
+        <label>Categoria<select id="g-cat">${CATS_SITIO.map(k=>`<option>${k}</option>`).join('')}</select></label>
+        <label>Quantidade (opcional)<input type="text" id="g-qtd" placeholder="Ex.: 3 rolos"></label>
+        <label>Valor (R$)<input type="text" inputmode="decimal" id="g-valor" placeholder="0,00"></label>
+        <label>Data<input type="date" id="g-data" value="${isoData(new Date())}"></label>
+        <label class="largo">Quem pagou<select id="g-pago">${Object.entries(SOCIOS).map(([k,n])=>`<option value="${k}">${n}</option>`).join('')}</select></label>
+      </div>${erro}${botoesJanela('Salvar gasto')}`;
+  } else if (j.tipo==='sitio-acerto'){
+    const c = contasSitio(), credor = c.lucas.saldo >= 0 ? 'lucas' : 'marcos', dev = outroSocio(credor);
+    const sugerido = Math.abs(c.lucas.saldo);
+    corpo = `<h2 style="margin:0">Registrar acerto</h2>
+      <p style="color:var(--muted);margin:4px 0 16px">${sugerido<0.01 ? 'As contas estão em dia.' : `Hoje <b>${SOCIOS[dev]}</b> deve <b>${real2(sugerido)}</b> a ${SOCIOS[credor]}.`}</p>
+      <div class="campos">
+        <label class="largo">Quem pagou<select id="a-de">${Object.entries(SOCIOS).map(([k,n])=>`<option value="${k}" ${k===dev?'selected':''}>${n} pagou a ${SOCIOS[outroSocio(k)]}</option>`).join('')}</select></label>
+        <label>Valor (R$)<input type="text" inputmode="decimal" id="a-valor" value="${sugerido<0.01?'':sugerido.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}"></label>
+        <label>Data<input type="date" id="a-data" value="${isoData(new Date())}"></label>
+        <label class="largo">Observação (opcional)<input type="text" id="a-obs" placeholder="Ex.: PIX de novembro"></label>
+      </div>${erro}${botoesJanela('Registrar acerto')}`;
+  } else if (j.tipo==='novo'){
+    corpo = `<h2 style="margin:0">Novo interessado</h2>
+      <p style="color:var(--muted);margin:4px 0 16px">O cliente entra na etapa Interessado e aguarda o Lucas encaminhar para um corretor.</p>
+      <div class="campos">
+        <label class="largo">Nome<input type="text" id="f-nome" placeholder="Nome do cliente" value="${esc(j.pre?.nome||"")}"></label>
+        <label>Telefone / WhatsApp<input type="tel" id="f-tel" placeholder="(11) 90000-0000" value="${esc(j.pre?.tel||"")}"></label>
+        <label>Origem<select id="f-origem">${ORIGENS_CLI.map(o=>`<option ${j.pre?.origem===o?'selected':''}>${o}</option>`).join('')}</select></label>
+        <label class="largo">Imóvel de interesse<input type="text" id="f-imovel" list="lista-imoveis" placeholder="Escolha ou digite"></label>
+        <datalist id="lista-imoveis">${estado.imoveis.map(i=>`<option value="${i.nome}">`).join('')}</datalist>
+      </div>${erro}${botoesJanela('Cadastrar interessado')}`;
+  } else if (j.tipo==='tarefa'){
+    corpo = `<h2 style="margin:0">Nova tarefa</h2>
+      <p style="color:var(--muted);margin:4px 0 16px">O aviso amarelo aparece 1 hora antes; o vermelho, se passar da hora sem marcar como realizada.</p>
+      <div class="campos">
+        <label class="largo">Descrição<input type="text" id="f-titulo" placeholder="Ex.: Ligar para a Mariana"></label>
+        <label>Data<input type="date" id="f-data" value="${isoData(new Date())}"></label>
+        <label>Horário<input type="time" id="f-hora" value="${fmtHora(emMin(60))}"></label>
+      </div>${erro}${botoesJanela('Criar tarefa')}`;
+  } else if (j.tipo==='descartar'){
+    corpo = `<h2 style="margin:0">Descartar da negociação</h2>
+      <p style="color:var(--muted);margin:4px 0 16px"><b>${n.cliente}</b> sai do funil e fica guardado no Cadastro de interesse.</p>
+      <div class="campos"><label class="largo">Motivo<input type="text" id="f-motivo" value="Não teve interesse"></label></div>
+      ${erro}${botoesJanela('Descartar')}`;
+  } else if (j.tipo==='fechar'){
+    const im = estado.imoveis.find(x=>x.nome===n.imovel), v0 = im ? im.valor : 300000;
+    corpo = `<h2 style="margin:0">Fechar negócio</h2>
+      <p style="color:var(--muted);margin:4px 0 16px"><b>${n.cliente}</b> · ${n.imovel}<br>A venda vai para Financeiro › A receber, com a entrada e as parcelas.</p>
+      ${n.reuniao ? '' : `<p class="alerta-suave">A reunião de fechamento com o Lucas ainda não foi agendada.</p>`}
+      <div class="campos">
+        <label class="largo">Valor total da venda (R$)<input type="text" inputmode="decimal" id="f-valor" value="${v0.toLocaleString('pt-BR')}"></label>
+        <label>Entrada (R$)<input type="text" inputmode="decimal" id="f-entrada" value="${Math.round(v0*0.2).toLocaleString('pt-BR')}"></label>
+        <label>Parcelas (0 = à vista)<input type="number" min="0" max="420" id="f-parc" value="12"></label>
+      </div>${erro}${botoesJanela('Fechar negócio')}`;
+  } else if (j.tipo==='novo-imovel'){
+    corpo = formNovoImovel(j.d) + erro + botoesJanela('Cadastrar imóvel');
+  } else if (j.tipo==='corretor'){
+    corpo = formCorretor(j.d) + erro + botoesJanela(j.d.id ? 'Salvar alterações' : 'Cadastrar corretor');
+  } else if (j.tipo==='cliente'){
+    corpo = formCliente(j.d) + erro + botoesJanela(j.d.original ? 'Salvar alterações' : 'Cadastrar cliente');
+  } else if (j.tipo==='ficha-cliente'){
+    corpo = fichaCliente(j.cli);
+  } else if (j.tipo==='mensagens'){
+    const c = clientePorNome(j.cli) || { nome:j.cli, tel:'' };
+    const cat = MENSAGENS.find(m=>m.id===j.cat);
+    const voltar = `<button class="voltar-msg" data-msg-voltar>‹ Voltar</button>`;
+    const trilha = `<div class="trilha-msg">Mensagens${cat?` › ${cat.nome}`:''}${j.msg!=null?` › ${cat.itens[j.msg][0]}`:''}</div>`;
+    if (!cat){
+      corpo = `${trilha}<h2 style="margin:0">Mensagem para ${c.nome.split(' ')[0]}</h2>
+        <p style="color:var(--muted);margin:4px 0 14px">Escolha o assunto.</p>
+        <div class="lista-msg">${MENSAGENS.map(m=>`<button class="item-msg" data-msg-cat="${m.id}"><span><b>${m.nome}</b><small>${m.desc}</small></span><span class="qtd-msg">${m.itens.length} ›</span></button>`).join('')}</div>`;
+    } else if (j.msg==null){
+      corpo = `${voltar}${trilha}<h2 style="margin:0">${cat.nome}</h2>
+        <p style="color:var(--muted);margin:4px 0 14px">Escolha a mensagem.</p>
+        <div class="lista-msg">${cat.itens.map(([t,txt],k)=>`<button class="item-msg" data-msg-escolha="${k}"><span><b>${t}</b><small>${preencherMensagem(txt,c.nome)}</small></span><span class="qtd-msg">›</span></button>`).join('')}</div>`;
+    } else {
+      const texto = preencherMensagem(cat.itens[j.msg][1], c.nome);
+      const falta = /\[[^\]]+\]/.test(texto);
+      corpo = `${voltar}${trilha}<h2 style="margin:0">${cat.itens[j.msg][0]}</h2>
+        <p style="color:var(--muted);margin:4px 0 12px">Para <b>${c.nome}</b>${c.tel?` · ${c.tel}`:''}. Você pode alterar o texto antes de enviar.</p>
+        <textarea class="texto-msg" id="texto-msg" rows="6">${texto}</textarea>
+        <p class="aviso-colchete" id="aviso-colchete" ${falta?'':'hidden'}>Complete o que está entre colchetes antes de enviar.</p>
+        <div class="botoes"><button class="btn sec" data-copiar-msg>Copiar texto</button>
+          <a class="btn btn-zap" id="enviar-zap" href="${linkZap(c.tel,texto)}" target="_blank" rel="noopener">${ICONE_ZAP} Enviar no WhatsApp</a></div>`;
+    }
+  } else if (j.tipo==='venda-imovel'){
+    const im = estado.imoveis[j.im];
+    const neg = estado.negocios.find(x=>x.imovel===im.nome && x.cliente===im.cliente);
+    const corPadrao = neg?.corretor || clientePorNome(im.cliente)?.captador || 1;
+    corpo = `<h2 style="margin:0">Registrar venda</h2>
+      <p style="color:var(--muted);margin:4px 0 16px"><b>${im.nome}</b><br>Comprador: <b>${im.cliente}</b></p>
+      <div class="campos">
+        <label class="largo">Valor negociado (R$)<input type="text" inputmode="decimal" id="v-valor" value="${im.valor.toLocaleString('pt-BR')}"></label>
+      </div>
+      <div class="rot-campo">Forma de pagamento</div>
+      <div class="forma-pag">
+        <label><input type="radio" name="v-forma" value="vista" data-forma-venda> À vista</label>
+        <label><input type="radio" name="v-forma" value="parcelado" data-forma-venda checked> Entrada + parcelas</label>
+      </div>
+      <div class="campos" id="bloco-parc">
+        <label>Entrada (R$)<input type="text" inputmode="decimal" id="v-entrada" value="${Math.round(im.valor*0.2).toLocaleString('pt-BR')}"></label>
+        <label>Número de parcelas<input type="number" min="1" max="420" id="v-parc" value="24"></label>
+      </div>
+      <div class="campos">
+        <label>Data da venda<input type="date" id="v-data" value="${isoData(new Date())}"></label>
+        <label>Corretor da venda<select id="v-cor">${estado.corretores.map(c=>`<option value="${c.id}" ${c.id===corPadrao?'selected':''}>${c.nome}</option>`).join('')}</select></label>
+      </div>
+      <div class="previa" id="v-previa"></div>
+      ${erro}${botoesJanela('OK')}`;
+  } else if (j.tipo==='encaminhar'){
+    corpo = `<h2 style="margin:0">Encaminhar para corretor</h2>
+      <p style="color:var(--muted);margin:4px 0 16px"><b>${n.cliente}</b> · ${n.imovel}<br>Escolha o corretor que vai atender este cliente.</p>
+      <div class="lista-cor">${estado.corretores.map(c=>{
+        const atend = estado.negocios.filter(x=>x.corretor===c.id).length;
+        return `<label><input type="radio" name="cor" value="${c.id}" ${c.id===(n.corretor||0)?'checked':''}>
+          <span><b>${c.nome}</b><small>${c.funcao} · ${atend} em atendimento · ${carteira(c.id).length} na carteira</small></span></label>`}).join('')}</div>
+      ${erro}${botoesJanela(n.corretor?'Trocar corretor':'Encaminhar')}`;
+  } else {
+    const q = n.reuniao?.quando || (()=>{const d=new Date(); d.setDate(d.getDate()+1); d.setHours(10,0,0,0); return d;})();
+    const dataISO = isoData(q);
+    corpo = `<h2 style="margin:0">Reunião de fechamento</h2>
+      <p style="color:var(--muted);margin:4px 0 16px"><b>${n.cliente}</b> · ${n.imovel}</p>
+      <div class="campos">
+        <label>Data<input type="date" id="r-data" value="${dataISO}"></label>
+        <label>Horário<input type="time" id="r-hora" value="${fmtHora(q)}"></label>
+        <label class="largo">Local<input type="text" id="r-local" value="${n.reuniao?.local || 'Escritório Zani Imóveis'}"></label>
+      </div>
+      <div style="font-size:12px;font-weight:600;color:var(--muted);margin:14px 0 6px">Participantes</div>
+      <div class="participantes">
+        <span class="fixo">${ICO.user} Lucas Zani <small>administrador · sempre participa</small></span>
+        <span>${ICO.user} ${nomeCor(n.corretor)} <small>corretor</small></span>
+        <span>${ICO.user} ${n.cliente} <small>cliente</small></span>
+      </div>
+      <p style="font-size:12px;color:var(--muted)">A reunião também entra na lista de Tarefas, com os avisos de horário.</p>
+      ${erro}${botoesJanela(n.reuniao?'Salvar alteração':'Agendar reunião')}`;
+  }
+  const semAnim = j.animou ? "sem-anim" : ""; j.animou = true;
+  return `<div class="fundo-janela" data-fechar-fundo><div class="janela form ${semAnim}" role="dialog">
+    <button class="fechar" data-fechar aria-label="Fechar">${ICO.x}</button><div class="janela-corpo">${corpo}</div></div></div>`;
+}
+
+// Retorna um texto de erro (a janela continua aberta) ou nada (deu certo)
+function confirmarJanela(){
+  const j = estado.janela, n = estado.negocios.find(x=>x.id===j.neg);
+  const val = id => ($('#'+id)?.value || '').trim();
+  const dataDe = s => { const [a,m,d] = s.split('-').map(Number); return new Date(a,m-1,d,12); };
+  if (j.tipo==='sitio-gasto'){
+    const valor = numBR(val('g-valor'));
+    if (!val('g-desc')) return 'Escreva a descrição do gasto.';
+    if (!valor || valor<=0) return 'Informe o valor do gasto.';
+    if (!val('g-data')) return 'Informe a data.';
+    estado.sitio.lancamentos.push({ id:Date.now(), data:dataDe(val('g-data')), descricao:val('g-desc'), categoria:val('g-cat'), qtd:val('g-qtd'), valor, pagoPor:val('g-pago') });
+    estado.sitio.filtroCat='todas'; estado.sitio.filtroMes='todos'; estado.sub.sitio='lancamentos';
+    avisar(`Gasto de ${real2(valor)} registrado, pago por ${SOCIOS[val('g-pago')]}.`);
+  } else if (j.tipo==='sitio-acerto'){
+    const valor = numBR(val('a-valor')), de = val('a-de');
+    if (!valor || valor<=0) return 'Informe o valor do acerto.';
+    if (!val('a-data')) return 'Informe a data.';
+    estado.sitio.acertos.push({ id:Date.now(), data:dataDe(val('a-data')), de, para:outroSocio(de), valor, obs:val('a-obs') });
+    estado.sub.sitio='acertos';
+    avisar(`Acerto de ${real2(valor)} registrado.`);
+  } else if (j.tipo==='novo'){
+    if (!val('f-nome')) return 'Preencha o nome do cliente.';
+    estado.negocios.push({ id:Date.now(), cliente:val('f-nome'), tel:val('f-tel'), imovel:val('f-imovel')||'A definir', origem:val('f-origem'), etapa:'interessado' });
+    if (!clientePorNome(val('f-nome'))) estado.clientes.push({ nome:val('f-nome'), tel:val('f-tel'), perfil:'Comprador', captador:null, origem:val('f-origem'), cadastro:isoData(new Date()), notas:[] });
+    estado.menu = 'negociacao'; avisar(`${val('f-nome')} entrou como interessado.`);
+  } else if (j.tipo==='tarefa'){
+    if (!val('f-titulo')) return 'Escreva a descrição da tarefa.';
+    if (!val('f-data') || !val('f-hora')) return 'Preencha a data e o horário.';
+    const [a,m,d] = val('f-data').split('-').map(Number), [h,mi] = val('f-hora').split(':').map(Number);
+    estado.tarefas.push({ id:Date.now(), titulo:val('f-titulo'), quando:new Date(a,m-1,d,h,mi), feita:false });
+  } else if (j.tipo==='descartar'){
+    estado.interesse.unshift({ cliente:n.cliente, imovel:n.imovel, saiuEm:ETAPAS.find(x=>x.id===n.etapa).nome, motivo:val('f-motivo')||'Não informado' });
+    estado.negocios = estado.negocios.filter(x=>x!==n);
+    avisar(`${n.cliente} foi para o Cadastro de interesse.`);
+  } else if (j.tipo==='fechar'){
+    const valor = numBR(val('f-valor')), nParc = parseInt(val('f-parc'),10) || 0;
+    const entrada = nParc ? numBR(val('f-entrada')) : valor;
+    if (!valor || valor<=0) return 'Informe o valor total da venda.';
+    if (isNaN(entrada) || entrada<0) return 'Informe o valor da entrada.';
+    if (entrada > valor) return 'A entrada não pode ser maior que o valor da venda.';
+    if (nParc && entrada===valor) return 'Com a entrada igual ao valor total, use 0 parcelas (à vista).';
+    const cap = clientePorNome(n.cliente)?.captador || n.corretor;
+    const nova = montarVenda({imovel:n.imovel,cliente:n.cliente,valor,entrada,parcelas:nParc,contrato:'Contrato novo / NF —',vendedor:n.corretor,captador:cap});
+    nova.data = new Date(); // fechado hoje
+    estado.vendas.unshift(nova);
+    estado.negocios = estado.negocios.filter(x=>x!==n);
+    estado.menu='financeiro'; estado.sub.financeiro='receber';
+    avisar(`Negócio fechado. A venda de ${n.cliente} foi para Financeiro › A receber.`);
+  } else if (j.tipo==='corretor'){
+    const e = salvarCorretor(j.d); if (e) return e;
+    avisar(j.d.id ? `${j.d.nome.trim()}: dados atualizados.` : `${j.d.nome.trim()} entrou na equipe.`);
+    estado.menu = 'cadastro'; estado.sub.cadastro = 'corretor';
+  } else if (j.tipo==='cliente'){
+    const e = salvarCliente(j.d); if (e) return e;
+    const nome = j.d.nome.trim().replace(/\s+/g,' ');
+    avisar(j.d.original ? `${nome}: dados atualizados.` : `${nome} cadastrado.`);
+    if (!j.d.original){ estado.menu = 'clientes'; estado.aba = 'zani'; estado.filtroCli = null; }
+    estado.proxJanela = { tipo:'ficha-cliente', cli:nome, focado:true };
+  } else if (j.tipo==='novo-imovel'){
+    const D = j.d, valor = numBR(D.valor), area = numBR(D.area), bairro = (D.bairro==='outro' ? D.bairroOutro : D.bairro || '').trim();
+    if (!D.tipo) return 'Escolha o tipo de imóvel.';
+    if (!valor || valor<=0) return 'Informe o valor do imóvel.';
+    if (!area || area<=0) return 'Informe a área do imóvel.';
+    if (!bairro) return 'Escolha ou digite o bairro.';
+    const terreno = D.tipo==='Terreno', comercial = D.tipo==='Comercial';
+    const q = terreno||comercial ? null : D.quartos, s = terreno||comercial ? null : D.suites;
+    const tipoBase = D.tipo==='Cobertura' ? 'Apartamento' : D.tipo;
+    const auto = terreno ? `Terreno ${area} m² — ${bairro}` : comercial ? `Sala comercial — ${bairro}` : D.tipo==='Cobertura' ? `Cobertura — ${bairro}`
+      : `${D.tipo==='Apartamento'?'Apto':'Casa'}${q ? ' '+plural(q,'quarto','quartos') : ''} — ${bairro}`;
+    const linhaQuartos = q ? plural(q,'quarto','quartos') + (s ? `, sendo ${plural(s,'suíte','suítes')}` : '') : null;
+    const novo = {
+      nome: D.titulo.trim() || auto, categoria: D.tipo, tipo: tipoBase, valor, area, status: D.status, captador: D.captador, cadastro: isoData(new Date()),
+      endereco: `${D.endereco.trim() || 'Endereço não informado'} — ${bairro}`,
+      quartos: q, suites: s, banheiros: terreno ? null : D.banheiros, vagas: terreno ? null : D.vagas,
+      andar: ['Apartamento','Cobertura','Comercial'].includes(D.tipo) && D.andar.trim() ? D.andar.trim() : null,
+      condominio: numBR(D.condominio) || null, terreno: D.tipo==='Casa' ? (numBR(D.terreno) || null) : null,
+      frente: terreno ? (numBR(D.frente) || null) : null, fundo: terreno ? (numBR(D.fundo) || null) : null,
+      descricao: D.descricao.trim(), ambientes: [linhaQuartos, ...D.ambientes].filter(Boolean), diferenciais: [...D.difs],
+      foto: D.fotos[0] || null, fotosEnviadas: D.fotos.length ? [...D.fotos] : null, videos: [...D.videos], galeria: [],
+    };
+    estado.imoveis.push(novo);
+    const F = FILTRO_VAZIO(); if (novo.status!=='Disponível') F.status = []; estado.filtroImo = F;
+    estado.menu = 'imoveis'; estado.aba = 'zani'; estado.imovelAberto = estado.imoveis.length-1; estado.fotoUnid = 0;
+    avisar(`${novo.nome} cadastrado.`);
+  } else if (j.tipo==='venda-imovel'){
+    const im = estado.imoveis[j.im], x = lerVenda(), e = erroVenda(x);
+    if (e) return e;
+    const meses = (x.data.getFullYear()-agora.getFullYear())*12 + (x.data.getMonth()-agora.getMonth());
+    const cap = clientePorNome(im.cliente)?.captador || x.cor;
+    const venda = montarVenda({imovel:im.nome, cliente:im.cliente, valor:x.valor, entrada:x.entrada, parcelas:x.nParc, inicio:meses, contrato:'Contrato novo / NF —', vendedor:x.cor, captador:cap});
+    venda.data = x.data; // guarda o dia exato da venda
+    estado.vendas.unshift(venda);
+    im.status = 'Vendido';
+    if (!clientePorNome(im.cliente)) estado.clientes.push({ nome:im.cliente, tel:'', perfil:'Comprador', captador:x.cor });
+    estado.negocios = estado.negocios.filter(n=>!(n.imovel===im.nome && n.cliente===im.cliente));
+    estado.menu = 'financeiro'; estado.aba = 'zani'; estado.sub.financeiro = 'vendas'; estado.mesFin = chaveMes(x.data);
+    avisar(`Venda registrada: ${real2(x.valor)} em ${nomeMes(estado.mesFin).toLowerCase()}.`);
+  } else if (j.tipo==='encaminhar'){
+    const sel = document.querySelector('input[name=cor]:checked');
+    if (!sel) return 'Escolha um corretor.';
+    n.corretor = Number(sel.value);
+    if (n.etapa==='interessado') n.etapa = 'potencial';
+    avisar(`${n.cliente} foi encaminhado para ${nomeCor(n.corretor)}.`);
+  } else {
+    const data = $('#r-data').value, hora = $('#r-hora').value, local = $('#r-local').value.trim() || 'Escritório Zani Imóveis';
+    if (!data || !hora) return 'Preencha a data e o horário.';
+    const [a,m,d] = data.split('-').map(Number), [h,mi] = hora.split(':').map(Number);
+    const quando = new Date(a,m-1,d,h,mi);
+    const titulo = `Reunião de fechamento — ${n.cliente} (com Lucas e ${nomeCor(n.corretor)}) · ${local}`;
+    const t = n.reuniao && estado.tarefas.find(x=>x.id===n.reuniao.tarefa);
+    if (t){ t.quando = quando; t.titulo = titulo; }
+    const idT = t ? t.id : Date.now();
+    if (!t) estado.tarefas.push({ id:idT, titulo, quando, feita:false });
+    n.reuniao = { quando, local, tarefa:idT };
+    avisar('Reunião agendada e incluída nas Tarefas.');
+  }
+  return '';
+}
+
+const saudacao = () => { const h = new Date().getHours(); return h<12 ? 'Bom dia' : h<18 ? 'Boa tarde' : 'Boa noite'; };
+const ST_UNID = { disp:'Disponível', res:'Reservada', vend:'Vendida' };
+function janelaUnidade(){
+  if (!estado.unidade) return '';
+  const [li,ui] = estado.unidade, l = estado.lancamentos[li], u = l.unidades[ui];
+  const fotos = [u.foto, FOTO_COZINHA, FOTO_QUARTO, FOTO_VARANDA];
+  const legendas = ['Sala de estar','Cozinha','Suíte','Varanda'];
+  const fi = estado.fotoUnid || 0;
+  const info = [
+    ['Andar', u.andar+'º'], ['Área privativa', u.area+' m²'], ['Quartos', u.quartos+` (${u.suites} suíte)`],
+    ['Banheiros', u.banheiros], ['Vagas de garagem', u.vagas], ['Posição', u.sol],
+    ['Valor', real(u.valor)], ['Valor do m²', real(u.valor/u.area)], ['Entrega', l.entrega],
+  ];
+  return `<div class="fundo-janela" data-fechar-fundo>
+    <div class="janela" role="dialog" aria-label="Unidade ${u.num}">
+      <button class="fechar" data-fechar aria-label="Fechar">${ICO.x}</button>
+      <div class="janela-foto"><img src="${foto(fotos[fi],1200)}" alt="${legendas[fi]} da unidade ${u.num}"><span class="tipo">${legendas[fi]} · imagem ilustrativa</span></div>
+      <div class="miniaturas">${fotos.map((f,i)=>`<button class="${i===fi?'ativa':''}" data-foto-idx="${i}"><img src="${foto(f,200)}" alt="${legendas[i]}"></button>`).join('')}</div>
+      <div class="janela-corpo">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+          <div><div class="trilha">${l.nome}</div><h2 style="margin:0">Unidade ${u.num}</h2></div>
+          <span class="status ${u.st==='disp'?'s-recebido':u.st==='res'?'s-receber':'s-atrasado'}">${ST_UNID[u.st]}</span>
+        </div>
+        <div class="info-unid">${info.map(([r,v])=>`<div><span>${r}</span><b>${v}</b></div>`).join('')}</div>
+        <div class="mudar-status">
+          <span>Status da unidade</span>
+          <div class="seletor">${Object.entries(ST_UNID).map(([k,n])=>`<button class="op-${k} ${u.st===k?'ativo':''}" data-status-unid="${k}">${n}</button>`).join('')}</div>
+          ${u.st!=='disp' ? `<label class="cliente-unid">${u.st==='res'?'Reservada para':'Vendida para'}
+            <input type="text" data-cliente-unid placeholder="Nome do cliente" value="${u.cliente||''}" list="lista-clientes"></label>
+            <datalist id="lista-clientes">${estado.clientes.map(c=>`<option value="${c.nome}">`).join('')}</datalist>` : ''}
+        </div>
+      </div>
+    </div></div>`;
+}
+
+/* detalhes do imóvel */
+const vendaDoImovel = i => i.cliente ? estado.vendas.find(v=>v.imovel===i.nome && v.cliente===i.cliente) : null;
+const ST_IMOVEL = [['Disponível','op-disp'],['Em negociação','op-res'],['Vendido','op-vend']];
+const statusImovel = s => s==='Disponível' ? 's-recebido' : s==='Vendido' ? 's-atrasado' : 's-receber';
+const plural = (n,s,p) => `${n} ${n===1?s:p}`;
+function resumoImovel(i){
+  const p = [];
+  if (i.quartos) p.push(plural(i.quartos,'quarto','quartos'));
+  if (i.banheiros) p.push(plural(i.banheiros,'banheiro','banheiros'));
+  if (i.vagas) p.push(plural(i.vagas,'vaga','vagas'));
+  if (i.frente) p.push(`${i.frente} x ${i.fundo} m`);
+  return p.join(' · ');
+}
+const AMB_FOTO = { sala:'Sala de estar', cozinha:'Cozinha', quarto:'Quarto', varanda:'Varanda' };
+function fotosImovel(i){
+  if (i.fotosEnviadas) return i.fotosEnviadas.map((u,k)=>[u, k===0 ? 'Foto principal' : `Foto ${k+1}`]);
+  if (!i.foto) return [];
+  const lista = [[i.foto,i.tipo==='Terreno' ? 'Terreno' : i.tipo==='Comercial' ? 'Sala comercial' : 'Fachada']];
+  (i.galeria||[]).forEach(([t,a,b])=>{
+    const id = t==='sala' ? FOTOS_SALA[(a||0) % FOTOS_SALA.length] : t==='cozinha' ? FOTO_COZINHA : t==='quarto' ? FOTO_QUARTO : FOTO_VARANDA;
+    const leg = t==='sala' ? (b || AMB_FOTO.sala) : (a || AMB_FOTO[t]);
+    lista.push([id, leg]);
+  });
+  return lista;
+}
+function janelaImovel(){
+  if (estado.imovelAberto==null) return '';
+  const i = estado.imoveis[estado.imovelAberto]; if (!i) return '';
+  const fotos = fotosImovel(i), fi = Math.min(estado.fotoUnid||0, fotos.length-1);
+  const info = [
+    ['Valor', real(i.valor)], ['Área', i.area+' m²'], ['Valor do m²', real(i.valor/i.area)],
+    i.quartos!=null && ['Quartos', i.quartos + (i.suites ? ` (${plural(i.suites,'suíte','suítes')})` : '')],
+    i.banheiros!=null && ['Banheiros', i.banheiros], i.vagas!=null && ['Vagas de garagem', i.vagas],
+    i.andar && ['Andar', i.andar], i.terreno && ['Terreno', i.terreno+' m²'],
+    i.frente && ['Medidas', `${i.frente} m x ${i.fundo} m`], i.condominio && ['Condomínio', real(i.condominio)+'/mês'],
+  ].filter(Boolean);
+  return `<div class="fundo-janela" data-fechar-fundo>
+    <div class="janela" role="dialog" aria-label="${i.nome}">
+      <button class="fechar" data-fechar aria-label="Fechar">${ICO.x}</button>
+      ${fotos.length ? `<div class="janela-foto"><img src="${foto(fotos[fi][0],1200)}" alt="${fotos[fi][1]} — ${i.nome}"><span class="tipo">${fotos[fi][1]}${i.fotosEnviadas ? '' : ' · imagem ilustrativa'}</span></div>`
+        : `<div class="janela-foto sem-foto-grande"><span>Imóvel sem fotos</span></div>`}
+      ${fotos.length>1 ? `<div class="miniaturas">${fotos.map(([f,l],k)=>`<button class="${k===fi?'ativa':''}" data-foto-idx="${k}" aria-label="${l}" title="${l}"><img src="${foto(f,200)}" alt=""></button>`).join('')}</div>` : ''}
+      <div class="janela-corpo">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+          <div><div class="trilha">${i.tipo}</div><h2 style="margin:0">${i.nome}</h2>
+            ${i.endereco ? `<div style="color:var(--muted);font-size:13px;margin-top:4px">${i.endereco}</div>` : ''}</div>
+          <span class="status ${statusImovel(i.status)}">${i.status}</span>
+        </div>
+        ${i.descricao ? `<p style="margin:12px 0 0;white-space:pre-line">${i.descricao}</p>` : ''}
+        ${i.videos?.length ? `<h3 class="tit-det">Vídeos</h3><div class="videos-imo">${i.videos.map(v=>`<video src="${v}" controls preload="metadata" playsinline></video>`).join('')}</div>` : ''}
+        <div class="info-unid">${info.map(([r,v])=>`<div><span>${r}</span><b>${v}</b></div>`).join('')}</div>
+        ${i.ambientes?.length ? `<h3 class="tit-det">${i.tipo==='Terreno' ? 'Características' : 'O que o imóvel tem'}</h3>
+          <ul class="lista-det">${i.ambientes.map(a=>`<li>${a}</li>`).join('')}</ul>` : ''}
+        ${i.diferenciais?.length ? `<h3 class="tit-det">Diferenciais</h3>
+          <div class="chips-det">${i.diferenciais.map(a=>`<span>${a}</span>`).join('')}</div>` : ''}
+        <div class="mudar-status">
+          <span>Status do imóvel</span>
+          <div class="seletor">${ST_IMOVEL.map(([s,c])=>`<button class="${c} ${i.status===s?'ativo':''}" data-status-imovel="${s}">${s}</button>`).join('')}</div>
+          ${i.status!=='Disponível' ? `<label class="cliente-unid">${i.status==='Vendido'?'Vendido para':'Em negociação com'}
+            <input type="text" data-cliente-imovel placeholder="Nome do cliente" value="${i.cliente||''}" list="lista-clientes-imo"></label>
+            <datalist id="lista-clientes-imo">${estado.clientes.map(c=>`<option value="${c.nome}">`).join('')}</datalist>` : ''}
+          ${i.status==='Vendido' ? (vendaDoImovel(i)
+            ? `<p class="venda-ok">${ICO.cal} Venda registrada no Financeiro de ${nomeMes(chaveMes(vendaDoImovel(i).data)).toLowerCase()}: ${real2(vendaDoImovel(i).valor)} · ${formaPag(vendaDoImovel(i))}</p>`
+            : `<p class="erro" id="erro-ok-venda" ${estado.erroOkVenda?'':'hidden'}>${estado.erroOkVenda||''}</p>
+               <button class="btn larga" data-ok-venda style="margin-top:12px">OK, registrar a venda</button>`) : ''}
+        </div>
+      </div>
+    </div></div>`;
+}
+
+/* filtros dos imóveis */
+const TIPOS_IMO = ['Apartamento','Casa','Cobertura','Terreno','Comercial'];
+const categoriaImovel = i => i.categoria || (/cobertura/i.test(i.nome) ? 'Cobertura' : i.tipo);
+const bairroDe = i => (i.endereco||'').split('—').pop().trim();
+const DIFS_FILTRO = [['piscina','Piscina'],['gourmet','Área gourmet'],['financiamento','Aceita financiamento'],['portaria','Portaria 24 horas'],['elevador','Elevador']];
+const temDif = (i,k) => [...(i.diferenciais||[]),...(i.ambientes||[])].join(' ').toLowerCase().includes(k);
+const FAIXAS_VALOR = [['Até 300 mil',null,300000],['300 a 600 mil',300000,600000],['600 mil a 1 milhão',600000,1000000],['Acima de 1 milhão',1000000,null]];
+const ORDENS_IMO = [['recentes','Mais recentes'],['menor','Menor preço'],['maior','Maior preço'],['area','Maior área'],['m2','Menor valor do m²']];
+const FILTRO_VAZIO = () => ({ tipos:[], vmin:null, vmax:null, status:['Disponível'], quartos:0, vagas:0, bairro:'', amin:null, amax:null, suite:false, difs:[], captador:0, ordem:'recentes', paraCliente:null });
+const filtroImo = () => estado.filtroImo || (estado.filtroImo = FILTRO_VAZIO());
+function imoveisFiltrados(F = filtroImo()){
+  const ok = i =>
+    (!F.tipos.length || F.tipos.includes(categoriaImovel(i))) &&
+    (F.vmin==null || i.valor>=F.vmin) && (F.vmax==null || i.valor<=F.vmax) &&
+    (!F.status.length || F.status.includes(i.status)) &&
+    (!F.quartos || (i.quartos||0)>=F.quartos) && (!F.vagas || (i.vagas||0)>=F.vagas) &&
+    (!F.bairro || bairroDe(i)===F.bairro) &&
+    (F.amin==null || i.area>=F.amin) && (F.amax==null || i.area<=F.amax) &&
+    (!F.suite || (i.suites||0)>0) && F.difs.every(k=>temDif(i,k)) &&
+    (!F.captador || i.captador===F.captador);
+  const ord = { recentes:(a,b)=>(b.cadastro||'').localeCompare(a.cadastro||''), menor:(a,b)=>a.valor-b.valor, maior:(a,b)=>b.valor-a.valor,
+                area:(a,b)=>b.area-a.area, m2:(a,b)=>a.valor/a.area-b.valor/b.area }[F.ordem] || (()=>0);
+  return estado.imoveis.filter(ok).sort(ord);
+}
+const milhar = v => v>=1000000 ? (v/1000000).toLocaleString('pt-BR',{maximumFractionDigits:2})+' mi' : (v/1000).toLocaleString('pt-BR',{maximumFractionDigits:0})+' mil';
+const faixaTexto = (a,b,fmt) => a!=null && b!=null ? `${fmt(a)} a ${fmt(b)}` : a!=null ? `acima de ${fmt(a)}` : `até ${fmt(b)}`;
+function tagsFiltro(){
+  const F = filtroImo(), t = [];
+  F.tipos.forEach(x=>t.push([x,'tipos:'+x]));
+  if (F.vmin!=null || F.vmax!=null) t.push(['R$ '+faixaTexto(F.vmin,F.vmax,milhar),'valor']);
+  if (!(F.status.length===1 && F.status[0]==='Disponível')) t.push([F.status.length ? F.status.join(', ') : 'Todos os status','status']);
+  if (F.quartos) t.push([F.quartos+'+ quartos','quartos']);
+  if (F.vagas) t.push([F.vagas+'+ vagas','vagas']);
+  if (F.suite) t.push(['Com suíte','suite']);
+  if (F.bairro) t.push([F.bairro,'bairro']);
+  if (F.amin!=null || F.amax!=null) t.push(['Área '+faixaTexto(F.amin,F.amax,v=>v+' m²'),'area']);
+  F.difs.forEach(k=>t.push([DIFS_FILTRO.find(d=>d[0]===k)[1],'difs:'+k]));
+  if (F.captador) t.push(['Captado por '+nomeCor(F.captador),'captador']);
+  return t;
+}
+const qtdFiltros = () => tagsFiltro().length;
+function tirarFiltro(k){
+  const F = filtroImo(), [c,v] = k.split(':');
+  if (c==='tipos' || c==='difs') F[c] = F[c].filter(x=>x!==v);
+  else if (c==='valor'){ F.vmin = F.vmax = null; }
+  else if (c==='area'){ F.amin = F.amax = null; }
+  else if (c==='status') F.status = ['Disponível'];
+  else if (c==='suite') F.suite = false;
+  else if (c==='bairro') F.bairro = '';
+  else F[c] = 0;
+  F.paraCliente = null;
+}
+function textoBusca(b){
+  if (!b) return '';
+  const p = [];
+  if (b.tipos?.length) p.push(b.tipos.join(' ou '));
+  if (b.vmin!=null || b.vmax!=null) p.push('R$ '+faixaTexto(b.vmin??null,b.vmax??null,milhar));
+  if (b.quartos) p.push(b.quartos+'+ quartos');
+  if (b.vagas) p.push(b.vagas+'+ vagas');
+  if (b.bairro) p.push(b.bairro);
+  (b.difs||[]).forEach(k=>p.push(DIFS_FILTRO.find(d=>d[0]===k)[1]));
+  return p.join(' · ');
+}
+function aplicarBusca(nome){
+  const b = clientePorNome(nome)?.busca || {}, F = FILTRO_VAZIO();
+  Object.assign(F, { tipos:[...(b.tipos||[])], vmin:b.vmin??null, vmax:b.vmax??null, quartos:b.quartos||0, vagas:b.vagas||0, bairro:b.bairro||'', difs:[...(b.difs||[])], paraCliente:nome });
+  estado.filtroImo = F;
+}
+const chipF = (attr,val,ativo,txt) => `<button class="chip-f ${ativo?'ativo':''}" data-${attr}="${val}" aria-pressed="${ativo}">${txt}</button>`;
+function janelaFiltros(){
+  if (!estado.filtrosAbertos) return '';
+  const F = filtroImo(), n = imoveisFiltrados().length;
+  const bairros = [...new Set(estado.imoveis.map(bairroDe).filter(Boolean))].sort();
+  const captadores = estado.corretores.filter(c=>estado.imoveis.some(i=>i.captador===c.id));
+  const num = (campo,ph) => `<input type="text" inputmode="numeric" data-f-num="${campo}" placeholder="${ph}" value="${F[campo]!=null ? F[campo].toLocaleString('pt-BR') : ''}">`;
+  const grupo = (t,c) => `<div class="grupo-f"><div class="rot-campo">${t}</div>${c}</div>`;
+  return `<div class="fundo-janela" data-fechar-fundo><div class="janela form janela-filtros ${estado.filtrosAbertos==='ja'?'sem-anim':''}" role="dialog" aria-label="Filtros">
+    <button class="fechar" data-fechar aria-label="Fechar">${ICO.x}</button>
+    <div class="janela-corpo">
+      <h2 style="margin:0 0 4px">Filtros</h2>
+      ${grupo('Tipo de imóvel', `<div class="chips-f">${TIPOS_IMO.map(t=>chipF('f-tipo',t,F.tipos.includes(t),t)).join('')}</div>`)}
+      ${grupo('Valor', `<div class="chips-f">${FAIXAS_VALOR.map(([t,a,b],k)=>chipF('f-faixa',k,F.vmin===a && F.vmax===b,t)).join('')}</div>
+        <div class="de-ate"><label>De R$ ${num('vmin','Mínimo')}</label><label>Até R$ ${num('vmax','Máximo')}</label></div>`)}
+      ${grupo('Status', `<div class="chips-f">${ST_IMOVEL.map(([s])=>chipF('f-status',s,F.status.includes(s),s)).join('')}</div>`)}
+      ${grupo('Quartos', `<div class="chips-f">${[0,1,2,3,4].map(q=>chipF('f-quartos',q,F.quartos===q,q?q+'+':'Todos')).join('')}</div>`)}
+      ${grupo('Vagas de garagem', `<div class="chips-f">${[0,1,2,3].map(q=>chipF('f-vagas',q,F.vagas===q,q?q+'+':'Todas')).join('')}</div>`)}
+      ${grupo('Suíte', `<div class="chips-f">${chipF('f-suite',1,F.suite,'Tem suíte')}</div>`)}
+      ${grupo('Bairro', `<select class="sel-f" data-f-sel="bairro"><option value="">Todos os bairros</option>${bairros.map(b=>`<option ${F.bairro===b?'selected':''}>${b}</option>`).join('')}</select>`)}
+      ${grupo('Área (m²)', `<div class="de-ate"><label>De ${num('amin','Mínima')}</label><label>Até ${num('amax','Máxima')}</label></div>`)}
+      ${grupo('Diferenciais', `<div class="chips-f">${DIFS_FILTRO.map(([k,t])=>chipF('f-dif',k,F.difs.includes(k),t)).join('')}</div>`)}
+      ${grupo('Captado por', `<select class="sel-f" data-f-sel="captador"><option value="0">Todos os corretores</option>${captadores.map(c=>`<option value="${c.id}" ${F.captador===c.id?'selected':''}>${c.nome}</option>`).join('')}</select>`)}
+      <div class="botoes"><button class="btn sec" data-limpar-filtros>Limpar</button><button class="btn" data-fechar id="ver-n">Ver ${plural(n,'imóvel','imóveis')}</button></div>
+    </div></div></div>`;
+}
+
+/* cadastrar imóvel */
+const AMBIENTES_OP = ['Sala de estar','Sala de jantar','Sala integrada','Cozinha','Cozinha americana','Cozinha planejada','Área de serviço','Lavanderia','Lavabo',
+  'Banheiro social','Closet','Home office','Escritório','Despensa','Dependência de serviço','Varanda','Sacada','Varanda gourmet','Área gourmet com churrasqueira',
+  'Piscina','Quintal','Jardim','Terraço','Garagem coberta','Edícula'];
+const DIFS_OP = ['Aceita financiamento','Aceita permuta','Documentação em dia','Elevador','Portaria 24 horas','Piscina no condomínio','Academia','Salão de festas',
+  'Playground','Aquecimento solar','Energia solar','Ar-condicionado','Armários planejados','Mobiliado','Vista panorâmica','Perto do comércio'];
+const novoRascunho = () => ({ tipo:'', status:'Disponível', captador:1, titulo:'', valor:'', area:'', condominio:'', andar:'', terreno:'', frente:'', fundo:'',
+  endereco:'', bairro:'', bairroOutro:'', quartos:null, suites:null, banheiros:null, vagas:null, ambientes:[], difs:[], descricao:'', fotos:[], videos:[] });
+const esc = t => String(t??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+function formNovoImovel(D){
+  const ch = (campo,val,txt) => `<button type="button" class="chip-f ${String(D[campo])===String(val)?'ativo':''}" data-ni="${campo}|${val}">${txt}</button>`;
+  const multi = (campo,val) => `<button type="button" class="chip-f ${D[campo].includes(val)?'ativo':''}" data-ni-multi="${campo}|${esc(val)}">${val}</button>`;
+  const txt = (campo,rot,ph='',modo='text',cls='') => `<label class="${cls}">${rot}<input type="text" ${modo!=='text'?`inputmode="${modo}"`:''} data-ni-txt="${campo}" placeholder="${ph}" value="${esc(D[campo])}"></label>`;
+  const grupo = (t,c,obs='') => `<div class="grupo-f"><div class="rot-campo">${t}${obs?` <small>${obs}</small>`:''}</div>${c}</div>`;
+  const num = (campo,rot,ops) => grupo(rot, `<div class="chips-f">${ops.map(n=>ch(campo,n,n)).join('')}
+      <input type="number" min="0" inputmode="numeric" class="outro-num" placeholder="Outro" aria-label="${rot}: outro número" data-ni-txt="${campo}" data-ni-num value="${D[campo]!=null && !ops.includes(D[campo]) ? D[campo] : ''}"></div>`);
+  const terreno = D.tipo==='Terreno', comercial = D.tipo==='Comercial', apto = ['Apartamento','Cobertura','Comercial'].includes(D.tipo);
+  const bairros = [...new Set(estado.imoveis.map(bairroDe).filter(Boolean))].sort();
+  const extrasAmb = D.ambientes.filter(a=>!AMBIENTES_OP.includes(a)), extrasDif = D.difs.filter(a=>!DIFS_OP.includes(a));
+  return `<h2 style="margin:0">Cadastrar imóvel</h2>
+    <p style="color:var(--muted);margin:4px 0 0">Toque nas opções para escolher. Os campos com * são obrigatórios.</p>
+
+    <div class="secao-ni">Fotos e vídeos</div>
+    <div class="uploads">
+      <label class="btn sec upload">${ICO.foto} Inserir fotos<input type="file" accept="image/*" multiple data-upload="fotos"></label>
+      <label class="btn sec upload">${ICO.video} Inserir vídeos<input type="file" accept="video/*" multiple data-upload="videos"></label>
+    </div>
+    ${D.fotos.length ? `<div class="thumbs">${D.fotos.map((u,k)=>`<div class="thumb ${k===0?'capa':''}"><img src="${u}" alt="Foto ${k+1}">
+        ${k===0 ? '<span class="selo">Principal</span>' : `<button type="button" class="tornar-capa" data-ni-capa="${k}">Tornar principal</button>`}
+        <button type="button" class="tira" data-ni-tira="fotos|${k}" aria-label="Remover foto ${k+1}">${ICO.x}</button></div>`).join('')}</div>`
+      : '<p class="dica-ni">Nenhuma foto ainda. A primeira foto vira a capa do imóvel.</p>'}
+    ${D.videos.length ? `<div class="thumbs">${D.videos.map((u,k)=>`<div class="thumb"><video src="${u}" muted preload="metadata"></video><span class="selo">${ICO.video} Vídeo ${k+1}</span>
+        <button type="button" class="tira" data-ni-tira="videos|${k}" aria-label="Remover vídeo ${k+1}">${ICO.x}</button></div>`).join('')}</div>` : ''}
+
+    <div class="secao-ni">Informações principais</div>
+    ${grupo('Tipo de imóvel *', `<div class="chips-f">${TIPOS_IMO.map(t=>ch('tipo',t,t)).join('')}</div>`)}
+    ${grupo('Status', `<div class="chips-f">${ST_IMOVEL.map(([s])=>ch('status',s,s)).join('')}</div>`)}
+    <div class="campos" style="margin-top:14px">
+      ${txt('valor','Valor (R$) *','Ex.: 450.000','decimal')}
+      ${txt('area','Área (m²) *','Ex.: 120','decimal')}
+      ${apto ? txt('andar','Andar','Ex.: 5º andar') : ''}
+      ${!terreno ? txt('condominio','Condomínio (R$/mês)','Se tiver','decimal') : ''}
+      ${D.tipo==='Casa' ? txt('terreno','Tamanho do terreno (m²)','Ex.: 300','decimal') : ''}
+      ${terreno ? txt('frente','Frente (m)','Ex.: 12','decimal') + txt('fundo','Fundo (m)','Ex.: 30','decimal') : ''}
+      ${txt('titulo','Nome do anúncio','Se deixar vazio, o app cria um','text','largo')}
+    </div>
+
+    <div class="secao-ni">Localização</div>
+    ${grupo('Bairro *', `<div class="chips-f">${bairros.map(b=>ch('bairro',b,b)).join('')}${ch('bairro','outro','Outro bairro')}</div>
+      ${D.bairro==='outro' ? `<div class="campos" style="margin-top:10px">${txt('bairroOutro','Nome do bairro','Digite o bairro','text','largo')}</div>` : ''}`)}
+    <div class="campos" style="margin-top:12px">${txt('endereco','Endereço','Rua e número','text','largo')}</div>
+
+    ${!terreno ? `<div class="secao-ni">Cômodos</div>
+      ${!comercial ? num('quartos','Quartos',[1,2,3,4]) + num('suites','Suítes',[0,1,2,3]) : ''}
+      ${num('banheiros','Banheiros',[1,2,3,4])}
+      ${num('vagas','Vagas de garagem',[0,1,2,3])}` : ''}
+
+    <div class="secao-ni">${terreno ? 'Características' : 'O que o imóvel tem'}</div>
+    <div class="chips-f">${(terreno ? ['Terreno plano','Terreno de esquina','Rua asfaltada','Água, luz e esgoto na rua','Murado'] : AMBIENTES_OP).map(a=>multi('ambientes',a)).join('')}${extrasAmb.map(a=>multi('ambientes',a)).join('')}</div>
+    <div class="add-outro"><input type="text" id="ni-add-ambientes" placeholder="Adicionar outro item"><button type="button" class="btn sec peq" data-ni-add="ambientes">Adicionar</button></div>
+
+    <div class="secao-ni">Diferenciais</div>
+    <div class="chips-f">${DIFS_OP.map(a=>multi('difs',a)).join('')}${extrasDif.map(a=>multi('difs',a)).join('')}</div>
+    <div class="add-outro"><input type="text" id="ni-add-difs" placeholder="Adicionar outro diferencial"><button type="button" class="btn sec peq" data-ni-add="difs">Adicionar</button></div>
+
+    <div class="secao-ni">Descrição</div>
+    <textarea class="texto-msg" rows="4" data-ni-txt="descricao" placeholder="Conte os pontos fortes do imóvel: localização, acabamento, vista, reforma...">${esc(D.descricao)}</textarea>
+
+    <div class="secao-ni">Captação</div>
+    ${grupo('Captado por', `<div class="chips-f">${estado.corretores.map(c=>ch('captador',c.id,c.nome)).join('')}</div>`)}`;
+}
+
+/* ===================== CLIENTES ===================== */
+const PERFIS_CLI = ['Comprador','Proprietário','Investidor','Locatário','Empresa'];
+const ORIGENS_CLI = ['Instagram','Indicação','Site','Portal','Placa','Outro'];
+const perfilGrupo = p => /^compr/i.test(p||'') ? 'Comprador' : /^propriet/i.test(p||'') ? 'Proprietário' : /^locat/i.test(p||'') ? 'Locatário' : (p||'—');
+const procuraImovel = p => ['Comprador','Investidor','Locatário'].includes(perfilGrupo(p));
+const SIT_CLI = [['todos','Todos'],['negociacao','Em negociação'],['comprou','Já compraram'],['sem','Sem negociação'],['semcor','Sem corretor']];
+function situacaoCli(c){
+  const neg = estado.negocios.find(n=>n.cliente===c.nome);
+  if (neg) return { id:'negociacao', txt:'Em negociação: '+ETAPAS.find(e=>e.id===neg.etapa).nome, cls:'s-receber', neg };
+  const venda = estado.vendas.find(v=>v.cliente===c.nome);
+  if (venda) return { id:'comprou', txt:'Comprou: '+venda.imovel, cls:'s-recebido', venda };
+  if (estado.interesse.find(x=>x.cliente===c.nome)) return { id:'sem', txt:'Saiu da negociação', cls:'s-pendente' };
+  return { id:'sem', txt:'Sem negociação', cls:'s-pendente' };
+}
+const dataISO = s => { if (!s) return null; const [a,m,d] = s.split('-').map(Number); return new Date(a,m-1,d,12); };
+const aniversarioNoMes = c => c.nascimento && Number(c.nascimento.slice(5,7))===agora.getMonth()+1;
+const idade = c => { const n = dataISO(c.nascimento); if (!n) return null; let i = agora.getFullYear()-n.getFullYear(); if (agora < new Date(agora.getFullYear(), n.getMonth(), n.getDate())) i--; return i; };
+const filtroCli = () => estado.filtroCli || (estado.filtroCli = { texto:'', perfil:'todos', situacao:'todos' });
+function clientesFiltrados(){
+  const F = filtroCli(), t = F.texto.trim().toLowerCase(), dig = t.replace(/\D/g,'');
+  return estado.clientes.filter(c =>
+    (!t || c.nome.toLowerCase().includes(t) || (dig.length>=3 && c.tel.replace(/\D/g,'').includes(dig)) || (c.email||'').toLowerCase().includes(t)) &&
+    (F.perfil==='todos' || perfilGrupo(c.perfil)===F.perfil) &&
+    (F.situacao==='todos' || (F.situacao==='semcor' ? !c.captador : situacaoCli(c).id===F.situacao))
+  ).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+}
+function listaClientesHTML(){
+  const L = clientesFiltrados();
+  if (!L.length) return `<div class="cartao vazio-filtro"><b>Nenhum cliente encontrado.</b><p>Confira a busca ou os filtros.</p></div>`;
+  return `<div class="lista-cli">${L.map(c=>{ const s = situacaoCli(c); return `<div class="cartao card-cli">
+      <button class="abre-ficha" data-ficha="${esc(c.nome)}" aria-label="Abrir ficha de ${esc(c.nome)}">
+        <span class="avatar">${c.nome.split(' ').map(p=>p[0]).slice(0,2).join('')}</span>
+        <span class="dados-cli"><b>${c.nome}</b><small>${c.tel}${c.perfil?` · ${perfilGrupo(c.perfil)}`:''}</small>
+          <span class="status ${s.cls}">${s.txt}</span>
+          <small>${c.captador ? 'Carteira de '+nomeCor(c.captador) : 'Ainda sem corretor'}</small></span>
+        <span class="seta-cli">›</span>
+      </button>
+      <div class="acoes-cli">${zap(c.nome,c.tel)}<button class="btn sec peq" data-mensagens="${esc(c.nome)}">Mensagens</button>
+        ${c.busca ? `<button class="btn sec peq" data-para-cliente="${esc(c.nome)}">Imóveis para ele</button>` : ''}</div>
+    </div>`}).join('')}</div>`;
+}
+TELAS.clientes = function(){
+  const F = filtroCli(), C = estado.clientes;
+  const emNeg = C.filter(c=>situacaoCli(c).id==='negociacao').length, comp = C.filter(c=>situacaoCli(c).id==='comprou').length;
+  const aniv = C.filter(aniversarioNoMes).sort((a,b)=>a.nascimento.slice(8)-b.nascimento.slice(8));
+  return cab('Clientes','Carteira de clientes da imobiliária: contatos, perfil de busca, negociações e compras.', `<button class="btn" data-acao="novo-cliente">+ Cadastrar cliente</button>`) + `
+    <div class="grade g3" style="margin-bottom:14px">
+      ${kpi('Clientes cadastrados', C.length, C.filter(c=>!c.captador).length+' ainda sem corretor', 'var(--azul)')}
+      ${kpi('Em negociação', emNeg, 'no funil de vendas', 'var(--amarelo)')}
+      ${kpi('Já compraram', comp, 'clientes com compra registrada', 'var(--verde)')}
+    </div>
+    ${aniv.length ? `<div class="cartao aniv"><div class="aniv-tit">${ICO.cal} Aniversariantes de ${NOMES_MES[agora.getMonth()].toLowerCase()}</div>
+      ${aniv.map(c=>{ const hoje = Number(c.nascimento.slice(8))===agora.getDate(); return `<div class="aniv-linha"><span><b>${c.nome}</b> · dia ${Number(c.nascimento.slice(8))}${hoje?' <span class="status s-recebido">Hoje</span>':''}</span>
+        <button class="btn sec peq" data-msg-direta="${esc(c.nome)}|relacionamento|1">Mandar parabéns</button></div>`}).join('')}</div>` : ''}
+    <div class="busca-cli"><input type="search" id="busca-cli" placeholder="Buscar por nome, telefone ou e-mail" value="${esc(F.texto)}" aria-label="Buscar cliente"></div>
+    <div class="sels-cli">
+      <label><span>Status</span><select class="sel-f" data-fcli-sel="situacao">${SIT_CLI.map(([k,t])=>`<option value="${k}" ${F.situacao===k?'selected':''}>${k==='todos'?'Todos os status':t}</option>`).join('')}</select></label>
+      <label><span>Perfis</span><select class="sel-f" data-fcli-sel="perfil">${[['todos','Todos os perfis'],...PERFIS_CLI.map(p=>[p,p])].map(([k,t])=>`<option value="${k}" ${F.perfil===k?'selected':''}>${t}</option>`).join('')}</select></label>
+    </div>
+    <div id="lista-clientes">${listaClientesHTML()}</div>`;
+};
+function rascunhoCliente(c){
+  const b = c?.busca || {};
+  return { original: c?.nome || null, nome: c?.nome || '', tel: c?.tel || '', email: c?.email || '', nascimento: c?.nascimento || '',
+    perfil: c ? perfilGrupo(c.perfil) : 'Comprador', origem: c?.origem || '', captador: c?.captador || 0, obs: '',
+    bTipos: [...(b.tipos||[])], vmin: b.vmin!=null ? b.vmin.toLocaleString('pt-BR') : '', vmax: b.vmax!=null ? b.vmax.toLocaleString('pt-BR') : '',
+    bQuartos: b.quartos || null, bVagas: b.vagas || null, bBairro: b.bairro || '', bDifs: [...(b.difs||[])] };
+}
+function formCliente(D){
+  const ch = (campo,val,txt) => `<button type="button" class="chip-f ${String(D[campo])===String(val)?'ativo':''}" data-ni="${campo}|${esc(val)}">${txt}</button>`;
+  const multi = (campo,val,txt=val) => `<button type="button" class="chip-f ${D[campo].includes(val)?'ativo':''}" data-ni-multi="${campo}|${esc(val)}">${txt}</button>`;
+  const txt = (campo,rot,ph='',tipo='text',cls='',modo='') => `<label class="${cls}">${rot}<input type="${tipo}" ${modo?`inputmode="${modo}"`:''} data-ni-txt="${campo}" placeholder="${ph}" value="${esc(D[campo])}"></label>`;
+  const grupo = (t,c) => `<div class="grupo-f"><div class="rot-campo">${t}</div>${c}</div>`;
+  const bairros = [...new Set(estado.imoveis.map(bairroDe).filter(Boolean))].sort();
+  return `<h2 style="margin:0">${D.original ? 'Editar cliente' : 'Cadastrar cliente'}</h2>
+    <p style="color:var(--muted);margin:4px 0 0">Os campos com * são obrigatórios.</p>
+    <div class="secao-ni">Contato</div>
+    <div class="campos">
+      ${txt('nome','Nome *','Nome completo','text','largo')}
+      ${txt('tel','Telefone / WhatsApp *','(11) 90000-0000','tel')}
+      ${txt('email','E-mail','nome@email.com','email')}
+      ${txt('nascimento','Data de nascimento','','date')}
+    </div>
+    <div class="secao-ni">Perfil</div>
+    ${grupo('O cliente é', `<div class="chips-f">${PERFIS_CLI.map(p=>ch('perfil',p,p)).join('')}</div>`)}
+    ${grupo('Como chegou até nós', `<div class="chips-f">${ORIGENS_CLI.map(o=>ch('origem',o,o)).join('')}</div>`)}
+    ${grupo('Corretor responsável (carteira)', `<div class="chips-f">${ch('captador',0,'Nenhum ainda')}${estado.corretores.map(c=>ch('captador',c.id,c.nome)).join('')}</div>`)}
+    ${procuraImovel(D.perfil) ? `<div class="secao-ni">O que ele procura</div>
+      <p class="dica-ni" style="margin-top:0">Com isso, o botão "Imóveis para ele" mostra só os imóveis que combinam.</p>
+      ${grupo('Tipo de imóvel', `<div class="chips-f">${TIPOS_IMO.map(t=>multi('bTipos',t)).join('')}</div>`)}
+      <div class="campos" style="margin-top:12px">${txt('vmin','Valor de (R$)','Mínimo','text','','decimal')}${txt('vmax','Valor até (R$)','Máximo','text','','decimal')}</div>
+      ${grupo('Quartos', `<div class="chips-f">${[1,2,3,4].map(n=>ch('bQuartos',n,n+'+')).join('')}</div>`)}
+      ${grupo('Vagas de garagem', `<div class="chips-f">${[1,2,3].map(n=>ch('bVagas',n,n+'+')).join('')}</div>`)}
+      ${grupo('Bairro de preferência', `<div class="chips-f">${ch('bBairro','','Qualquer bairro')}${bairros.map(b=>ch('bBairro',b,b)).join('')}</div>`)}
+      ${grupo('Faz questão de', `<div class="chips-f">${DIFS_FILTRO.map(([k,t])=>multi('bDifs',k,t)).join('')}</div>`)}` : ''}
+    <div class="secao-ni">${D.original ? 'Nova anotação' : 'Observações'}</div>
+    <textarea class="texto-msg" rows="3" data-ni-txt="obs" placeholder="Ex.: prefere contato à tarde, tem dois filhos, quer mudar até março...">${esc(D.obs)}</textarea>`;
+}
+function salvarCliente(D){
+  const nome = D.nome.trim().replace(/\s+/g,' '), tel = D.tel.trim();
+  if (!nome) return 'Preencha o nome do cliente.';
+  if (tel.replace(/\D/g,'').length < 10) return 'Preencha o telefone com DDD (10 ou 11 números).';
+  const outro = estado.clientes.find(c=>c.nome.toLowerCase()===nome.toLowerCase() && c.nome!==D.original);
+  if (outro) return 'Já existe um cliente com esse nome.';
+  const vmin = D.vmin.trim() ? numBR(D.vmin) : null, vmax = D.vmax.trim() ? numBR(D.vmax) : null;
+  if ((vmin!=null && isNaN(vmin)) || (vmax!=null && isNaN(vmax))) return 'Confira a faixa de valor.';
+  if (vmin!=null && vmax!=null && vmin>vmax) return 'O valor mínimo está maior que o máximo.';
+  const temBusca = procuraImovel(D.perfil) && (D.bTipos.length || vmin!=null || vmax!=null || D.bQuartos || D.bVagas || D.bBairro || D.bDifs.length);
+  const busca = temBusca ? { tipos:[...D.bTipos], vmin, vmax, quartos:D.bQuartos||0, vagas:D.bVagas||0, bairro:D.bBairro||'', difs:[...D.bDifs] } : null;
+  let c = D.original ? clientePorNome(D.original) : null;
+  if (!c){ c = { cadastro: isoData(new Date()), notas: [] }; estado.clientes.push(c); }
+  if (D.original && D.original!==nome){ // renomeia em todo o app
+    estado.negocios.forEach(x=>{ if (x.cliente===D.original) x.cliente = nome; });
+    estado.vendas.forEach(x=>{ if (x.cliente===D.original) x.cliente = nome; });
+    estado.imoveis.forEach(x=>{ if (x.cliente===D.original) x.cliente = nome; });
+    estado.interesse.forEach(x=>{ if (x.cliente===D.original) x.cliente = nome; });
+  }
+  Object.assign(c, { nome, tel, email:D.email.trim(), nascimento:D.nascimento, perfil:D.perfil, origem:D.origem, captador:D.captador||null, busca });
+  if (D.obs.trim()){ c.notas = c.notas || []; c.notas.unshift({ data: isoData(new Date()), texto: D.obs.trim() }); }
+  return '';
+}
+function fichaCliente(nome){
+  const c = clientePorNome(nome); if (!c) return '<p>Cliente não encontrado.</p>';
+  const s = situacaoCli(c), negs = estado.negocios.filter(n=>n.cliente===c.nome), compras = estado.vendas.filter(v=>v.cliente===c.nome);
+  const saiu = estado.interesse.filter(x=>x.cliente===c.nome), id = idade(c);
+  const info = [['Telefone', c.tel], c.email && ['E-mail', c.email], c.nascimento && ['Aniversário', fmtData(dataISO(c.nascimento)).slice(0,5) + (id!=null?` (${id} anos)`:'')],
+    ['Perfil', perfilGrupo(c.perfil)], c.origem && ['Origem', c.origem], ['Corretor', c.captador ? nomeCor(c.captador) : 'Ainda sem corretor'],
+    c.cadastro && ['Cliente desde', fmtData(dataISO(c.cadastro))]].filter(Boolean);
+  return `<div class="ficha-topo"><span class="avatar grande">${c.nome.split(' ').map(p=>p[0]).slice(0,2).join('')}</span>
+      <div><h2 style="margin:0">${c.nome}</h2><span class="status ${s.cls}">${s.txt}</span></div></div>
+    <div class="acoes-ficha">${zap(c.nome,c.tel)}<button class="btn sec peq" data-mensagens="${esc(c.nome)}">Mensagens</button>
+      <button class="btn sec peq" data-editar-cli="${esc(c.nome)}">Editar</button>
+      ${c.busca ? `<button class="btn sec peq" data-para-cliente="${esc(c.nome)}">Imóveis para ele</button>` : ''}
+      ${!negs.length ? `<button class="btn sec peq" data-iniciar-neg="${esc(c.nome)}">Iniciar negociação</button>` : ''}</div>
+    <div class="info-unid">${info.map(([r,v])=>`<div><span>${r}</span><b>${v}</b></div>`).join('')}</div>
+    ${c.busca ? `<h3 class="tit-det">O que procura</h3><p style="margin:0">${textoBusca(c.busca)}</p>` : ''}
+    <h3 class="tit-det">Negociações</h3>
+    ${negs.length ? negs.map(n=>`<div class="linha-ficha"><span><b>${n.imovel}</b><small>Etapa: ${ETAPAS.find(e=>e.id===n.etapa).nome} · Corretor: ${nomeCor(n.corretor)}${n.reuniao?` · Reunião em ${fmtData(n.reuniao.quando)} às ${fmtHora(n.reuniao.quando)}`:''}</small></span>
+        <button class="btn sec peq" data-ir-neg>Ver</button></div>`).join('')
+      : `<p class="dica-ni" style="margin:0">Nenhuma negociação em andamento.${saiu.length?` Saiu do funil na etapa ${saiu[0].saiuEm} (${saiu[0].motivo}).`:''}</p>`}
+    <h3 class="tit-det">Compras</h3>
+    ${compras.length ? compras.map(v=>{ const pct = Math.round(valRecebido(v)/v.valor*100); return `<div class="linha-ficha"><span><b>${v.imovel}</b>
+        <small>${fmtData(v.data)} · ${real2(v.valor)} · ${formaPag(v)} · ${pct}% pago</small></span><button class="btn sec peq" data-ir-fin>Financeiro</button></div>`}).join('')
+      : '<p class="dica-ni" style="margin:0">Nenhuma compra registrada.</p>'}
+    <h3 class="tit-det">Anotações</h3>
+    <div class="add-outro" style="margin-top:0"><input type="text" id="nova-nota" placeholder="Escreva uma anotação"><button class="btn sec peq" data-nota-cli="${esc(c.nome)}">Salvar</button></div>
+    ${(c.notas||[]).length ? `<div class="notas">${c.notas.map(n=>`<div><small>${fmtData(dataISO(n.data))}</small>${esc(n.texto)}</div>`).join('')}</div>` : '<p class="dica-ni">Nenhuma anotação ainda.</p>'}
+    <div class="botoes"><button class="btn sec" data-fechar>Fechar</button></div>`;
+}
+
+/* cadastrar e editar corretor */
+const FUNCOES_COR = ['Corretor','Corretora','Corretor associado','Gerente de vendas','Administrador'];
+const rascunhoCorretor = c => ({ id: c?.id || null, nome: c?.nome || '', tel: c?.tel || '', email: c?.email || '',
+  creci: (c?.creci || '').replace(/^CRECI\s*/i,''), funcao: c?.funcao || 'Corretor', inicio: c?.inicio || isoData(new Date()) });
+function formCorretor(D){
+  const ch = (campo,val) => `<button type="button" class="chip-f ${D[campo]===val?'ativo':''}" data-ni="${campo}|${esc(val)}">${val}</button>`;
+  const txt = (campo,rot,ph='',tipo='text',cls='',modo='') => `<label class="${cls}">${rot}<input type="${tipo}" ${modo?`inputmode="${modo}"`:''} data-ni-txt="${campo}" placeholder="${ph}" value="${esc(D[campo])}"></label>`;
+  const c = D.id ? corretor(D.id) : null, cart = D.id ? carteira(D.id).length : 0, atend = D.id ? estado.negocios.filter(n=>n.corretor===D.id).length : 0;
+  return `<h2 style="margin:0">${D.id ? 'Editar corretor' : 'Cadastrar corretor'}</h2>
+    <p style="color:var(--muted);margin:4px 0 0">${D.id ? `${cart} cliente${cart===1?'':'s'} na carteira · ${atend} em atendimento` : 'O corretor passa a aparecer no encaminhamento de clientes, nas vendas e na captação de imóveis.'}</p>
+    <div class="secao-ni">Dados</div>
+    <div class="campos">
+      ${txt('nome','Nome *','Nome completo','text','largo')}
+      ${txt('tel','Telefone / WhatsApp *','(11) 90000-0000','tel')}
+      ${txt('email','E-mail','nome@email.com','email')}
+      ${txt('creci','Número do CRECI','Ex.: 123456-F','text')}
+      ${txt('inicio','Na equipe desde','','date')}
+    </div>
+    <div class="secao-ni">Função</div>
+    <div class="chips-f">${FUNCOES_COR.map(f=>ch('funcao',f)).join('')}</div>`;
+}
+function salvarCorretor(D){
+  const nome = D.nome.trim().replace(/\s+/g,' '), tel = D.tel.trim();
+  if (!nome) return 'Preencha o nome do corretor.';
+  if (tel.replace(/\D/g,'').length < 10) return 'Preencha o telefone com DDD (10 ou 11 números).';
+  if (estado.corretores.some(c=>c.nome.toLowerCase()===nome.toLowerCase() && c.id!==D.id)) return 'Já existe um corretor com esse nome.';
+  const creci = D.creci.trim() ? 'CRECI ' + D.creci.trim().replace(/^CRECI\s*/i,'') : '';
+  let c = D.id ? corretor(D.id) : null;
+  if (!c){ c = { id: Math.max(...estado.corretores.map(x=>x.id)) + 1 }; estado.corretores.push(c); }
+  Object.assign(c, { nome, tel, email: D.email.trim(), creci, funcao: D.funcao, inicio: D.inicio });
+  return '';
+}
+
+function kpi(rot,val,det,cor){return `<div class="cartao kpi"><div class="faixa" style="background:${cor}"></div><div class="rot">${rot}</div><div class="val">${val}</div><div class="det">${det}</div></div>`}
+function subabas(tela,itens,atual){return `<div class="subabas">${itens.map(([id,n])=>`<button class="subaba ${id===atual?'ativa':''}" data-sub="${tela}:${id}">${n}</button>`).join('')}</div>`}
+function tab(cols,linhas){return `<table><thead><tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>${linhas.map(l=>`<tr>${l.map(x=>`<td>${x}</td>`).join('')}</tr>`).join('')}</tbody></table>`}
+function linhaTarefa(t){
+  const s = situacao(t);
+  const aviso = s==='atrasada' ? `<span class="aviso atrasada">${ICO.alerta} Atrasada</span>` : s==='atencao' ? `<span class="aviso atencao">${ICO.relogio} Está chegando a hora</span>` : '';
+  return `<div class="tarefa ${s}"><input type="checkbox" data-tarefa="${t.id}" ${t.feita?'checked':''} aria-label="Marcar como realizada">
+    <div class="txt"><b>${t.titulo}</b><small>Hoje às ${fmtHora(t.quando)}${t.feita?' · realizada':''}</small></div>${aviso}</div>`;
+}
+
+/* ===================== SÍTIO — PRESTAÇÃO DE CONTAS DA SOCIEDADE ===================== */
+const SOCIOS = { lucas:'Lucas Zani', marcos:'Marcos Andrade' };   // Marcos Andrade é um nome de exemplo
+const outroSocio = s => s==='lucas' ? 'marcos' : 'lucas';
+const CATS_SITIO = ['Materiais','Mão de obra','Insumos','Manutenção','Combustível','Contas'];
+const diasAtras = n => { const d = new Date(agora); d.setDate(d.getDate()-n); d.setHours(12,0,0,0); return d; };
+estado.sitio = {
+  parte: 50, // % do Lucas na sociedade (o Marcos fica com o resto)
+  filtroCat:'todas', filtroMes:'todos',
+  lancamentos: [
+    { id:1,  data:diasAtras(75), descricao:'Arame farpado para a cerca',        categoria:'Materiais',   qtd:'3 rolos',  valor:1140,   pagoPor:'lucas' },
+    { id:2,  data:diasAtras(70), descricao:'Mourões de eucalipto',              categoria:'Materiais',   qtd:'40 un.',   valor:1600,   pagoPor:'marcos' },
+    { id:3,  data:diasAtras(62), descricao:'Salário do caseiro',                categoria:'Mão de obra', qtd:'',         valor:2200,   pagoPor:'lucas' },
+    { id:4,  data:diasAtras(55), descricao:'Ração para o gado',                 categoria:'Insumos',     qtd:'10 sacos', valor:980,    pagoPor:'marcos' },
+    { id:5,  data:diasAtras(48), descricao:'Diesel para o trator',              categoria:'Combustível', qtd:'120 L',    valor:744,    pagoPor:'lucas' },
+    { id:6,  data:diasAtras(40), descricao:'Conta de luz',                      categoria:'Contas',      qtd:'',         valor:312.40, pagoPor:'marcos' },
+    { id:7,  data:diasAtras(33), descricao:'Salário do caseiro',                categoria:'Mão de obra', qtd:'',         valor:2200,   pagoPor:'lucas' },
+    { id:8,  data:diasAtras(27), descricao:'Conserto da bomba d\'água',         categoria:'Manutenção',  qtd:'',         valor:650,    pagoPor:'marcos' },
+    { id:9,  data:diasAtras(20), descricao:'Adubo e mudas de frutíferas',       categoria:'Insumos',     qtd:'25 mudas', valor:870,    pagoPor:'lucas' },
+    { id:10, data:diasAtras(12), descricao:'Telhas para o galpão',              categoria:'Materiais',   qtd:'60 un.',   valor:1380,   pagoPor:'lucas' },
+    { id:11, data:diasAtras(6),  descricao:'Conta de luz',                      categoria:'Contas',      qtd:'',         valor:298.90, pagoPor:'lucas' },
+    { id:12, data:diasAtras(3),  descricao:'Gasolina para a roçadeira',         categoria:'Combustível', qtd:'20 L',     valor:128,    pagoPor:'marcos' },
+  ],
+  // Acerto = um sócio paga ao outro para equilibrar as contas
+  acertos: [ { id:1, data:diasAtras(30), de:'marcos', para:'lucas', valor:1000, obs:'Acerto parcial' } ],
+};
+const mesDe = d => d.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+function contasSitio(){
+  const S = estado.sitio, total = S.lancamentos.reduce((s,l)=>s+l.valor,0);
+  const pct = { lucas:S.parte/100, marcos:1-S.parte/100 };
+  const r = {};
+  for (const s of ['lucas','marcos']){
+    const pago = S.lancamentos.filter(l=>l.pagoPor===s).reduce((a,l)=>a+l.valor,0);
+    const deu = S.acertos.filter(a=>a.de===s).reduce((a,x)=>a+x.valor,0);
+    const recebeu = S.acertos.filter(a=>a.para===s).reduce((a,x)=>a+x.valor,0);
+    r[s] = { pago, parte: total*pct[s], saldo: pago - total*pct[s] + deu - recebeu };
+  }
+  return { total, ...r };
+}
+function telaSitio(){
+  const S = estado.sitio, c = contasSitio(), sub = estado.sub.sitio || 'lancamentos';
+  const credor = c.lucas.saldo >= 0 ? 'lucas' : 'marcos', valorSaldo = Math.abs(c.lucas.saldo);
+  const emDia = valorSaldo < 0.01;
+  const pctL = S.parte, pctM = 100 - S.parte;
+  let corpo;
+
+  if (sub==='lancamentos'){
+    const meses = [...new Set([...S.lancamentos].sort((a,b)=>b.data-a.data).map(l=>mesDe(l.data)))];
+    const lista = S.lancamentos.filter(l => (S.filtroCat==='todas' || l.categoria===S.filtroCat) && (S.filtroMes==='todos' || mesDe(l.data)===S.filtroMes))
+                               .sort((a,b)=>b.data-a.data);
+    const soma = lista.reduce((s,l)=>s+l.valor,0);
+    corpo = `<div class="filtros">
+        <label>Categoria<select id="filtro-cat" data-filtro-sitio="filtroCat"><option value="todas">Todas</option>${CATS_SITIO.map(k=>`<option ${S.filtroCat===k?'selected':''}>${k}</option>`).join('')}</select></label>
+        <label>Mês<select id="filtro-mes" data-filtro-sitio="filtroMes"><option value="todos">Todos</option>${meses.map(m=>`<option ${S.filtroMes===m?'selected':''}>${m}</option>`).join('')}</select></label>
+        <span class="filtros-total">${lista.length} lançamento${lista.length===1?'':'s'} · <b>${real2(soma)}</b></span>
+      </div>
+      <div class="lista-mob">${lista.map(l=>`<div class="item-mob">
+          <div class="l1"><b>${l.descricao}</b><b class="valor">${real2(l.valor)}</b></div>
+          <div class="l2"><span>${fmtData(l.data)}</span><span class="tag cat-${CATS_SITIO.indexOf(l.categoria)}">${l.categoria}</span>${l.qtd?`<span>${l.qtd}</span>`:''}</div>
+          <div class="l2"><span>Pago por <span class="socio s-${l.pagoPor}">${SOCIOS[l.pagoPor].split(' ')[0]}</span></span><span class="dir">Lucas ${real2(l.valor*pctL/100)} · Marcos ${real2(l.valor*pctM/100)}</span></div>
+        </div>`).join('') || '<p style="color:var(--muted)">Nenhum lançamento com esses filtros.</p>'}</div>
+      <div class="rolagem so-desktop"><table><thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Quantidade</th><th>Pago por</th><th class="num">Valor</th><th class="num">Parte Lucas (${pctL}%)</th><th class="num">Parte Marcos (${pctM}%)</th></tr></thead><tbody>
+      ${lista.map(l=>`<tr><td>${fmtData(l.data)}</td><td><b>${l.descricao}</b></td><td><span class="tag cat-${CATS_SITIO.indexOf(l.categoria)}">${l.categoria}</span></td><td>${l.qtd||'—'}</td>
+        <td><span class="socio s-${l.pagoPor}">${SOCIOS[l.pagoPor].split(' ')[0]}</span></td><td class="num"><b>${real2(l.valor)}</b></td>
+        <td class="num">${real2(l.valor*pctL/100)}</td><td class="num">${real2(l.valor*pctM/100)}</td></tr>`).join('') || `<tr><td colspan="8" style="color:var(--muted)">Nenhum lançamento com esses filtros.</td></tr>`}
+      </tbody></table></div>`;
+  }
+
+  if (sub==='categorias'){
+    const porCat = CATS_SITIO.map(k=>({k, v:S.lancamentos.filter(l=>l.categoria===k).reduce((s,l)=>s+l.valor,0)})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v);
+    const max = Math.max(...porCat.map(x=>x.v), 1);
+    corpo = `<div class="cats">${porCat.map(x=>`<div class="cat-linha">
+        <span class="cat-nome">${x.k}</span>
+        <div class="cat-barra"><div style="width:${x.v/max*100}%"></div></div>
+        <span class="cat-valor">${real2(x.v)}</span><span class="cat-pct">${Math.round(x.v/c.total*100)}%</span></div>`).join('')}</div>`;
+  }
+
+  if (sub==='acertos'){
+    corpo = `<p style="color:var(--muted);margin:0 0 12px">Acerto é quando um sócio paga ao outro para equilibrar as contas da sociedade.</p>
+      <div class="rolagem"><table><thead><tr><th>Data</th><th>Quem pagou</th><th>Quem recebeu</th><th>Observação</th><th class="num">Valor</th></tr></thead><tbody>
+      ${[...S.acertos].sort((a,b)=>b.data-a.data).map(a=>`<tr><td>${fmtData(a.data)}</td><td>${SOCIOS[a.de]}</td><td>${SOCIOS[a.para]}</td><td>${a.obs||'—'}</td><td class="num"><b>${real2(a.valor)}</b></td></tr>`).join('') || `<tr><td colspan="5" style="color:var(--muted)">Nenhum acerto registrado.</td></tr>`}
+      </tbody></table></div>`;
+  }
+
+  return cab('Financeiro do sítio', `Prestação de contas da sociedade entre ${SOCIOS.lucas} e ${SOCIOS.marcos}: materiais, gastos e custos.`,
+      `<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn sec" data-acao-sitio="acerto">Registrar acerto</button><button class="btn" data-acao-sitio="gasto">+ Novo gasto</button></div>`) + `
+    <div class="sociedade">
+      <span>Divisão da sociedade</span>
+      <label>${SOCIOS.lucas} <input type="number" id="parte-lucas" min="0" max="100" step="1" value="${pctL}" data-parte-sitio> %</label>
+      <span class="sep">·</span>
+      <span>${SOCIOS.marcos} <b>${pctM} %</b></span>
+    </div>
+    <div class="grade g4" style="margin-bottom:16px">
+      ${kpi('Total de gastos', real2(c.total), S.lancamentos.length+' lançamentos', 'var(--amarelo)')}
+      ${kpi(SOCIOS.lucas+' pagou', real2(c.lucas.pago), `a parte dele é ${real2(c.lucas.parte)}`, 'var(--azul)')}
+      ${kpi(SOCIOS.marcos+' pagou', real2(c.marcos.pago), `a parte dele é ${real2(c.marcos.parte)}`, 'var(--laranja)')}
+      <div class="cartao kpi saldo ${emDia?'ok':''}"><div class="faixa" style="background:${emDia?'var(--verde)':'var(--vermelho)'}"></div>
+        <div class="rot">Saldo entre os sócios</div>
+        <div class="val">${emDia ? 'Em dia' : real2(valorSaldo)}</div>
+        <div class="det">${emDia ? 'ninguém deve nada' : `${SOCIOS[outroSocio(credor)]} deve a ${SOCIOS[credor]} (já descontados os acertos)`}</div></div>
+    </div>
+    <div class="cartao">
+      ${subabas('sitio',[['lancamentos','Lançamentos'],['categorias','Por categoria'],['acertos','Acertos entre sócios']],sub)}
+      ${corpo}
+    </div>`;
+}
+
+// Celular: barra de baixo com as telas mais usadas + "Mais" para o resto
+const NAV_MOBILE = ['inicio','negociacao','financeiro','tarefas'];
+const EM_MAIS = ['clientes','imoveis','cadastro','lancamentos'];
+const ICO_MAIS = ic('<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>');
+function renderNavMobile(){
+  const semNav = estado.aba==='sitio';
+  $('#app').classList.toggle('sem-nav', semNav);
+  if (semNav){ $('#navMobile').innerHTML=''; $('#maisMobile').innerHTML=''; return; }
+  $('#navMobile').innerHTML = NAV_MOBILE.map(id=>{
+    const m = MENU.find(x=>x.id===id);
+    const c = id==='tarefas' && atrasadas() ? `<span class="cont">${atrasadas()}</span>` : '';
+    return `<button class="${estado.menu===id&&!estado.mais?'ativo':''}" data-menu="${id}" aria-label="${m.nome}">${m.icone}${m.nome}${c}</button>`;
+  }).join('') + `<button class="${EM_MAIS.includes(estado.menu)||estado.mais?'ativo':''}" data-mais aria-label="Mais opções">${ICO_MAIS}Mais</button>`;
+  $('#maisMobile').innerHTML = !estado.mais ? '' : `<div class="folha-mais" data-fechar-mais><div class="folha" role="dialog" aria-label="Mais opções">
+      <div class="alca"></div><h3>Mais opções</h3>
+      ${EM_MAIS.map(id=>{const m=MENU.find(x=>x.id===id);return `<button data-menu="${id}">${m.icone}${m.nome}</button>`}).join('')}
+    </div></div>`;
+}
+
+// Celular: cada linha de tabela vira um cartão, com o nome da coluna ao lado do valor
+function prepararTabelas(){
+  document.querySelectorAll('#conteudo table').forEach(t=>{
+    const cab = [...t.querySelectorAll('thead th')].map(th=>th.textContent.trim());
+    t.classList.add('cartoes');
+    t.querySelectorAll('tbody tr').forEach(tr=>[...tr.children].forEach((td,i)=>{ if(!td.hasAttribute('colspan')) td.dataset.label = cab[i]||''; }));
+  });
+}
+
+function render(){
+  renderAbas(); renderMenu(); renderNavMobile();
+  // mantém a rolagem da janela aberta quando ela é redesenhada (ex.: tocar numa opção do formulário)
+  const chave = estado.filtrosAbertos ? 'filtros' : estado.janela ? 'j-'+estado.janela.tipo+(estado.janela.cat||'')+(estado.janela.msg??'') : estado.imovelAberto!=null ? 'i-'+estado.imovelAberto : '';
+  const rolagem = document.querySelector('.janela')?.scrollTop || 0;
+  $('#conteudo').innerHTML = (estado.aba==='sitio' ? telaSitio() : TELAS[estado.menu]()) + janelaForm();
+  const jn = document.querySelector('.janela');
+  if (jn && chave && chave===render.chave) jn.scrollTop = rolagem;
+  render.chave = chave;
+  if (document.querySelector('.janela-filtros')) estado.filtrosAbertos = 'ja';
+  prepararTabelas();
+  const primeiro = document.querySelector('.janela.form:not(.janela-filtros) input:not([type=radio]), .janela.form:not(.janela-filtros) select');
+  if (primeiro && !estado.janela?.focado){ primeiro.focus(); estado.janela.focado = true; }
+  if (estado.janela?.tipo==='venda-imovel') atualizarVenda();
+}
+
+/* janela "Registrar venda" do imóvel */
+function lerVenda(){
+  const val = id => ($('#'+id)?.value || '').trim();
+  const avista = document.querySelector('input[name=v-forma]:checked')?.value === 'vista';
+  const valor = numBR(val('v-valor'));
+  const nParc = avista ? 0 : parseInt(val('v-parc'),10);
+  const entrada = avista ? valor : numBR(val('v-entrada'));
+  const [a,m,d] = val('v-data').split('-').map(Number);
+  const data = a ? new Date(a,m-1,d,12) : null;
+  return { avista, valor, nParc, entrada, data, cor:Number(val('v-cor')) };
+}
+function erroVenda(x){
+  if (!x.valor || x.valor<=0) return 'Informe o valor negociado.';
+  if (!x.avista){
+    if (isNaN(x.entrada) || x.entrada<0) return 'Informe o valor da entrada (pode ser 0).';
+    if (x.entrada >= x.valor) return 'A entrada precisa ser menor que o valor negociado. Se foi pago tudo de uma vez, marque À vista.';
+    if (!x.nParc || x.nParc<1) return 'Informe o número de parcelas (1 ou mais).';
+    if (x.nParc>420) return 'O número máximo de parcelas é 420.';
+  }
+  if (!x.data) return 'Informe a data da venda.';
+  return '';
+}
+function atualizarVenda(){
+  const x = lerVenda(), bloco = $('#bloco-parc'), p = $('#v-previa'); if (!p) return;
+  if (bloco) bloco.hidden = x.avista;
+  if (erroVenda(x)){ p.innerHTML = '<span style="color:var(--muted)">Preencha os campos para ver o resumo.</span>'; return; }
+  const parc = x.nParc ? (x.valor-x.entrada)/x.nParc : 0;
+  p.innerHTML = `<div><span>Forma</span><b>${x.avista ? 'À vista: '+real2(x.valor) : `Entrada de ${real2(x.entrada)} + ${x.nParc}x de ${real2(parc)}`}</b></div>
+    <div><span>Comissão (${+(TAXA_PADRAO*100).toFixed(2)}%)</span><b>${real2(x.valor*TAXA_PADRAO)}</b></div>
+    <div><span>Entra no Financeiro de</span><b>${nomeMes(chaveMes(x.data))}</b></div>`;
+}
+document.addEventListener('input', e=>{
+  const campo = e.target.dataset.niTxt, D = estado.janela?.d; if (!campo || !D) return;
+  if (e.target.dataset.niNum!==undefined){
+    const v = e.target.value.trim(); D[campo] = v==='' ? null : Math.max(0, parseInt(v,10) || 0);
+    document.querySelectorAll(`[data-ni^="${campo}|"]`).forEach(c=>c.classList.toggle('ativo', D[campo]!=null && c.dataset.ni===`${campo}|${D[campo]}`));
+  } else D[campo] = e.target.value;
+});
+document.addEventListener('input', e=>{ // busca de clientes: atualiza só a lista, sem perder o foco do campo
+  if (e.target.id!=='busca-cli') return;
+  filtroCli().texto = e.target.value; const l = $('#lista-clientes'); if (l) l.innerHTML = listaClientesHTML();
+});
+document.addEventListener('keydown', e=>{ // Enter na anotação da ficha salva
+  if (e.key==='Enter' && e.target.id==='nova-nota'){ e.preventDefault(); $('[data-nota-cli]')?.click(); }
+});
+document.addEventListener('keydown', e=>{ // Enter no "adicionar outro" adiciona o item
+  if (e.key==='Enter' && e.target.id?.startsWith('ni-add-')){ e.preventDefault(); $(`[data-ni-add="${e.target.id.slice(7)}"]`)?.click(); }
+});
+document.addEventListener('change', e=>{
+  const tipo = e.target.dataset.upload, D = estado.janela?.d; if (!tipo || !D) return;
+  const arquivos = [...e.target.files].filter(f => f.type.startsWith(tipo==='fotos' ? 'image/' : 'video/'));
+  arquivos.forEach(f => D[tipo].push(URL.createObjectURL(f)));
+  if (arquivos.length) avisar(`${plural(arquivos.length, tipo==='fotos'?'foto adicionada':'vídeo adicionado', tipo==='fotos'?'fotos adicionadas':'vídeos adicionados')}.`);
+  render();
+});
+document.addEventListener('input', e=>{
+  if (e.target.id!=='texto-msg') return;
+  const c = clientePorNome(estado.janela?.cli) || {}, a = $('#enviar-zap'), av = $('#aviso-colchete');
+  if (a) a.href = linkZap(c.tel, e.target.value);
+  if (av) av.hidden = !/\[[^\]]+\]/.test(e.target.value);
+});
+document.addEventListener('input', e=>{
+  const k = e.target.dataset.fNum; if (!k) return;
+  const v = numBR(e.target.value); filtroImo()[k] = e.target.value.trim() && !isNaN(v) ? v : null; filtroImo().paraCliente = null;
+  const b = $('#ver-n'); if (b) b.textContent = 'Ver ' + plural(imoveisFiltrados().length,'imóvel','imóveis');
+});
+document.addEventListener('input', e=>{ if (estado.janela?.tipo==='venda-imovel' && e.target.closest('.janela')) atualizarVenda(); });
+
+/* ===================== AÇÕES ===================== */
+document.addEventListener('click', e=>{
+  if (e.target.matches('[data-fechar-fundo]')){ estado.unidade=null; estado.imovelAberto=null; estado.janela=null; estado.filtrosAbertos=false; render(); return; }
+  if (e.target.matches('[data-fechar-mais]')){ estado.mais=false; render(); return; }
+  const b = e.target.closest('button, input'); if(!b) return;
+  const d = b.dataset;
+  if (d.unidade){ estado.unidade = d.unidade.split(':').map(Number); estado.fotoUnid = 0; }
+  else if (d.imovel){ estado.imovelAberto = Number(d.imovel); estado.fotoUnid = 0; }
+  else if (d.fechar!==undefined){ estado.unidade = null; estado.imovelAberto = null; estado.janela = null; estado.filtrosAbertos = false; }
+  else if (d.abrirFiltros!==undefined){ estado.filtrosAbertos = true; }
+  else if (d.mensagens){ estado.janela = { tipo:'mensagens', cli:d.mensagens, cat:null, msg:null, focado:true }; }
+  else if (d.msgCat){ estado.janela.cat = d.msgCat; estado.janela.msg = null; }
+  else if (d.msgEscolha!==undefined){ estado.janela.msg = Number(d.msgEscolha); }
+  else if (d.msgVoltar!==undefined){ if (estado.janela.msg!=null) estado.janela.msg = null; else estado.janela.cat = null; }
+  else if (d.copiarMsg!==undefined){
+    const t = $('#texto-msg'); t.select();
+    (navigator.clipboard ? navigator.clipboard.writeText(t.value) : Promise.reject()).then(()=>avisar('Texto copiado.'), ()=>{ try { document.execCommand('copy'); avisar('Texto copiado.'); } catch(_){ avisar('Selecione o texto e copie manualmente.'); } });
+    return;
+  }
+  else if (d.limparFiltros!==undefined){ const o = filtroImo().ordem; estado.filtroImo = FILTRO_VAZIO(); estado.filtroImo.ordem = o; }
+  else if (d.tiraFiltro){ tirarFiltro(d.tiraFiltro); }
+  else if (d.paraCliente){ aplicarBusca(d.paraCliente); estado.janela = null; estado.menu = 'imoveis'; estado.aba = 'zani'; render(); $('#conteudo').scrollTop = 0; return; }
+  else if (d.fTipo || d.fFaixa!==undefined || d.fStatus || d.fQuartos!==undefined || d.fVagas!==undefined || d.fSuite || d.fDif){
+    const F = filtroImo(), alterna = (lista,v) => lista.includes(v) ? lista.filter(x=>x!==v) : [...lista,v];
+    if (d.fTipo) F.tipos = alterna(F.tipos, d.fTipo);
+    if (d.fFaixa!==undefined){ const [,a,b] = FAIXAS_VALOR[d.fFaixa]; const igual = F.vmin===a && F.vmax===b; F.vmin = igual?null:a; F.vmax = igual?null:b; }
+    if (d.fStatus) F.status = alterna(F.status, d.fStatus);
+    if (d.fQuartos!==undefined) F.quartos = Number(d.fQuartos);
+    if (d.fVagas!==undefined) F.vagas = Number(d.fVagas);
+    if (d.fSuite) F.suite = !F.suite;
+    if (d.fDif) F.difs = alterna(F.difs, d.fDif);
+    F.paraCliente = null;
+  }
+  else if (d.okVenda!==undefined && estado.imovelAberto!=null){
+    const im = estado.imoveis[estado.imovelAberto], nome = ($('[data-cliente-imovel]')?.value || '').trim();
+    if (!nome){ const p = $('#erro-ok-venda'); p.textContent = 'Digite o nome do cliente que comprou.'; p.hidden = false; $('[data-cliente-imovel]').focus(); return; }
+    im.cliente = nome;
+    estado.janela = { tipo:'venda-imovel', im: estado.imovelAberto }; estado.imovelAberto = null;
+  }
+  else if (d.confirmar!==undefined){
+    const erro = confirmarJanela();
+    if (erro){ estado.janela.erro = erro; const p = document.querySelector('.janela .erro');
+      if (p) p.textContent = erro; else document.querySelector('.janela .botoes').insertAdjacentHTML('beforebegin', `<p class="erro">${erro}</p>`);
+      return; } // mostra o erro sem apagar o que foi digitado
+    estado.janela = estado.proxJanela || null; estado.proxJanela = null;
+  }
+  else if (d.encaminhar){ estado.janela = { tipo:'encaminhar', neg:Number(d.encaminhar) }; }
+  else if (d.reuniao){ estado.janela = { tipo:'reuniao', neg:Number(d.reuniao) }; }
+  else if (d.statusUnid){
+    const [li,ui] = estado.unidade, u = estado.lancamentos[li].unidades[ui];
+    u.st = d.statusUnid; if (u.st==='disp') u.cliente = '';
+  }
+  else if (d.statusImovel && estado.imovelAberto!=null){
+    const im = estado.imoveis[estado.imovelAberto];
+    if (im.status!==d.statusImovel){ im.status = d.statusImovel; if (im.status==='Disponível') im.cliente = ''; avisar(`${im.nome}: ${im.status.toLowerCase()}`); }
+  }
+  else if (d.fotoIdx){ estado.fotoUnid = Number(d.fotoIdx); }
+  else if (d.aba){ const mudou = estado.aba!==d.aba; estado.aba = d.aba; estado.mais=false; if (mudou){ render(); $('#conteudo').scrollTop = 0; return; } }
+  else if (d.mais!==undefined){ estado.mais = !estado.mais; }
+  else if (d.etapaMob){ estado.etapaMob = d.etapaMob; }
+  else if (d.menu || d.ir){
+    const novo = d.menu || d.ir, mudou = novo!==estado.menu || estado.aba!=='zani';
+    estado.menu = novo; estado.aba='zani'; estado.mais=false; estado.imovelAberto=null; estado.filtrosAbertos=false;
+    if (mudou){ render(); $('#conteudo').scrollTop = 0; return; }
+  }
+  else if (d.sub){ const [t,s]=d.sub.split(':'); estado.sub[t]=s; }
+  else if (d.mesPasso){
+    const ms = mesesFin(), atual = mesAtualFin();
+    if (atual==='todos') estado.mesFin = chaveMes(agora);
+    else { const i = ms.indexOf(atual)+Number(d.mesPasso); if (i>=0 && i<ms.length) estado.mesFin = ms[i]; }
+  }
+  else if (d.mesIr){ estado.mesFin = d.mesIr; estado.sub.financeiro = 'receber'; $('#conteudo').scrollTop = 0; }
+  else if (d.avancar){
+    const n = estado.negocios.find(x=>x.id==d.avancar);
+    const i = ETAPAS.findIndex(x=>x.id===n.etapa);
+    if (n.etapa==='interessado'){ estado.janela = { tipo:'encaminhar', neg:n.id }; } // Lucas escolhe o corretor
+    else if (i < ETAPAS.length-1){
+      // Depois da visita, o cliente fica na carteira de quem o captou
+      if (n.etapa==='visita' && n.corretor){
+        let c = clientePorNome(n.cliente);
+        if (!c){ c = { nome:n.cliente, tel:n.tel||'', perfil:'Comprador', captador:null }; estado.clientes.push(c); }
+        if (!c.captador){ c.captador = n.corretor; avisar(`${n.cliente} entrou na carteira de ${nomeCor(n.corretor)}, que fez a visita e captou o cliente.`); }
+        else avisar(`${n.cliente} passou para ${ETAPAS[i+1].nome}.`);
+      } else avisar(`${n.cliente} passou para ${ETAPAS[i+1].nome}.`);
+      n.etapa = ETAPAS[i+1].id;
+    }
+    else { estado.janela = { tipo:'fechar', neg:n.id }; } // fechamento → contrato/NF → a receber
+  }
+  else if (d.perder){ estado.janela = { tipo:'descartar', neg:Number(d.perder) }; }
+  else if (d.abrir){ const v=estado.vendas[d.abrir]; estado.abertos.has(v) ? estado.abertos.delete(v) : estado.abertos.add(v); }
+  else if (d.pagar){ const [vi,pi]=d.pagar.split(':'); const p=estado.vendas[vi].pagamentos[pi]; p.pago=!p.pago; }
+  else if (d.tarefa){ const t=estado.tarefas.find(x=>x.id==d.tarefa); t.feita=b.checked; }
+  else if (d.acaoSitio){ estado.janela = { tipo:'sitio-'+d.acaoSitio }; }
+  else if (d.acao==='novo-negocio'){ estado.janela = { tipo:'novo' }; }
+  else if (d.acao==='nova-tarefa'){ estado.janela = { tipo:'tarefa' }; }
+  else if (d.acao==='novo-cliente' || (d.acao==='cadastrar' && (estado.sub.cadastro||'clientes')==='clientes')){
+    estado.janela = { tipo:'cliente', d: rascunhoCliente(null), focado:true };
+  }
+  else if (d.acao==='cadastrar' && estado.sub.cadastro==='corretor'){ estado.janela = { tipo:'corretor', d: rascunhoCorretor(null), focado:true }; }
+  else if (d.editarCor){ estado.janela = { tipo:'corretor', d: rascunhoCorretor(corretor(Number(d.editarCor))), focado:true }; }
+  else if (d.ficha){ estado.janela ={ tipo:'ficha-cliente', cli:d.ficha, focado:true }; }
+  else if (d.editarCli){ estado.janela = { tipo:'cliente', d: rascunhoCliente(clientePorNome(d.editarCli)), focado:true, animou:true }; }
+  else if (d.iniciarNeg){ const c = clientePorNome(d.iniciarNeg); estado.janela = { tipo:'novo', pre:{ nome:c.nome, tel:c.tel, origem:c.origem } }; }
+  else if (d.irNeg!==undefined){ estado.janela = null; estado.menu = 'negociacao'; render(); $('#conteudo').scrollTop = 0; return; }
+  else if (d.irFin!==undefined){ estado.janela = null; estado.menu = 'financeiro'; estado.sub.financeiro = 'receber'; estado.mesFin = 'todos'; render(); $('#conteudo').scrollTop = 0; return; }
+  else if (d.notaCli){
+    const c = clientePorNome(d.notaCli), t = ($('#nova-nota')?.value || '').trim();
+    if (!t){ $('#nova-nota').focus(); return; }
+    c.notas = c.notas || []; c.notas.unshift({ data: isoData(new Date()), texto: t }); avisar('Anotação salva.');
+  }
+  else if (d.fcli){ const [k,v] = d.fcli.split('|'); filtroCli()[k] = v; }
+  else if (d.msgDireta){ const [cli,cat,msg] = d.msgDireta.split('|'); estado.janela = { tipo:'mensagens', cli, cat, msg:Number(msg), focado:true }; }
+  else if (d.acao==='novo-imovel' || (d.acao==='cadastrar' && estado.sub.cadastro==='imoveis')){
+    estado.janela = { tipo:'novo-imovel', d: novoRascunho(), focado:true }; estado.imovelAberto = null; estado.filtrosAbertos = false;
+  }
+  else if ((d.ni || d.niMulti || d.niAdd || d.niTira || d.niCapa!==undefined) && estado.janela?.d){
+    const D = estado.janela.d;
+    if (d.ni){ const [c,v] = d.ni.split('|'), n = ['quartos','suites','banheiros','vagas','captador','bQuartos','bVagas'].includes(c), val = n ? Number(v) : v;
+      D[c] = (n && c!=='captador' && D[c]===val) ? null : val; }
+    if (d.niMulti){ const [c,v] = d.niMulti.split('|'); D[c] = D[c].includes(v) ? D[c].filter(x=>x!==v) : [...D[c], v]; }
+    if (d.niAdd){ const inp = $('#ni-add-'+d.niAdd), v = inp.value.trim(); if (!v){ inp.focus(); return; } if (!D[d.niAdd].includes(v)) D[d.niAdd].push(v); }
+    if (d.niTira){ const [c,k] = d.niTira.split('|'); const [u] = D[c].splice(Number(k),1); }
+    if (d.niCapa!==undefined){ const [u] = D.fotos.splice(Number(d.niCapa),1); D.fotos.unshift(u); }
+  }
+  else if (d.acao){ avisar('Esta função será montada na próxima etapa.'); return; }
+  else if (b.id==='btnMenu'){ $('#lateral').classList.toggle('aberta'); return; }
+  else return;
+  render();
+});
+
+document.addEventListener('keydown', e=>{ if (e.key==='Escape' && (estado.unidade || estado.imovelAberto!=null || estado.janela || estado.filtrosAbertos)){ estado.unidade=null; estado.imovelAberto=null; estado.janela=null; estado.filtrosAbertos=false; render(); } });
+document.addEventListener('change', e=>{
+  if (e.target.dataset.ordemImo!==undefined){ filtroImo().ordem = e.target.value; render(); return; }
+  if (e.target.dataset.selUnidade!==undefined){ if (e.target.value==='') return; estado.unidade = [Number(e.target.dataset.selUnidade), Number(e.target.value)]; estado.fotoUnid = 0; render(); return; }
+  if (e.target.dataset.fcliSel){ filtroCli()[e.target.dataset.fcliSel] = e.target.value; const l = $('#lista-clientes'); if (l) l.innerHTML = listaClientesHTML(); return; }
+  if (e.target.dataset.fSel){ const F = filtroImo(), k = e.target.dataset.fSel; F[k] = k==='captador' ? Number(e.target.value) : e.target.value; F.paraCliente = null; render(); return; }
+  if (e.target.dataset.fNum){ render(); return; } // valores já guardados ao digitar; redesenha para atualizar as etiquetas
+  if (e.target.dataset.formaVenda!==undefined){ atualizarVenda(); return; }
+  if (e.target.dataset.clienteImovel!==undefined && estado.imovelAberto!=null){ estado.imoveis[estado.imovelAberto].cliente = e.target.value.trim(); return; }
+  if (e.target.dataset.clienteUnid!==undefined && estado.unidade){
+    const [li,ui] = estado.unidade; estado.lancamentos[li].unidades[ui].cliente = e.target.value.trim(); return;
+  }
+  if (e.target.dataset.mesFin!==undefined){ estado.mesFin = e.target.value; render(); return; }
+  const fs = e.target.dataset.filtroSitio;
+  if (fs){ estado.sitio[fs] = e.target.value; render(); return; }
+  if (e.target.dataset.parteSitio!==undefined){
+    const v = Math.round(Number(e.target.value)); if (isNaN(v)||v<0||v>100) return;
+    estado.sitio.parte = v; render(); return;
+  }
+  const ic2 = e.target.dataset.taxaCap;
+  if (ic2!==undefined){ const v = Number(e.target.value); if (isNaN(v)||v<0||v>100) return; estado.vendas[ic2].taxaCaptacao = v/100; render(); return; }
+  const i = e.target.dataset.taxa; if (i===undefined) return;
+  const v = Number(e.target.value); if (isNaN(v) || v<0 || v>100) return;
+  estado.vendas[i].taxa = v/100; render();
+});
+
+$('#hoje').textContent = agora.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+setInterval(()=>{ if (!estado.janela && !estado.unidade && estado.imovelAberto==null && !estado.filtrosAbertos) render(); }, 60000); // atualiza os avisos das tarefas a cada minuto (sem apagar formulário aberto)
+render();
+</script>
